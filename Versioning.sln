@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Versioning", "Versioning\Ve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Versioning.Tests", "Versioning.Tests\Versioning.Tests.csproj", "{0E1421A7-241E-4B85-8BAE-D4AB44FEA198}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyGenerator", "AssemblyGenerator\AssemblyGenerator.csproj", "{7A13EEBA-D820-4A1A-BAB9-8A624E6A2C62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0E1421A7-241E-4B85-8BAE-D4AB44FEA198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E1421A7-241E-4B85-8BAE-D4AB44FEA198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E1421A7-241E-4B85-8BAE-D4AB44FEA198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A13EEBA-D820-4A1A-BAB9-8A624E6A2C62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A13EEBA-D820-4A1A-BAB9-8A624E6A2C62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A13EEBA-D820-4A1A-BAB9-8A624E6A2C62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A13EEBA-D820-4A1A-BAB9-8A624E6A2C62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

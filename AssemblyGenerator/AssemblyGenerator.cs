@@ -45,7 +45,7 @@ namespace Versioning
 				stream.Seek(0, SeekOrigin.Begin);
 				return stream;
 			}
-			throw new Exception("Emitting failed. ");
+			throw new Exception("Emitting failed");
 		}
 
 		public static AssemblyLoadContext Load(

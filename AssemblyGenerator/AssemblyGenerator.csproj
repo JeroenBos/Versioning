@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>8.0</LangVersion>
+		<RootNamespace>Versioning</RootNamespace>
+		<AssemblyName>Versioning.AssemblyGenerator</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
+  </ItemGroup>
 
 </Project>

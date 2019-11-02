@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.Loader;
 
 namespace Versioning
 {
@@ -14,7 +15,7 @@ namespace Versioning
 		  MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
 		};
 
-		public static MemoryStream CreateAssembly(
+		public static Stream CreateAssembly(
 			string sourceCode,
 			string assemblyName,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
@@ -31,7 +32,7 @@ namespace Versioning
 				OutputKind.DynamicallyLinkedLibrary,
 				optimizationLevel: optimizationLevel,
 				allowUnsafe: true);
-			Compilation compilation =  CSharpCompilation.Create(assemblyName, options: compilationOptions, references: _references)
+			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions, references: _references)
 			  .AddReferences(_references)
 			  .AddSyntaxTrees(syntaxTree);
 
@@ -45,6 +46,18 @@ namespace Versioning
 				return stream;
 			}
 			throw new Exception("Emitting failed. ");
+		}
+
+		public static AssemblyLoadContext Load(
+			string sourceCode,
+			string assemblyName,
+			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
+			LanguageVersion languageVersion = LanguageVersion.CSharp8)
+		{
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, optimizationLevel, languageVersion);
+			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
+			context.LoadFromStream(assemblyStream);
+			return context;
 		}
 	}
 }

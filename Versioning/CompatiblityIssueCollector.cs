@@ -90,16 +90,10 @@ namespace Versioning
 		private MethodInfo? ResolveMethod(MethodInfo method, Type type)
 		{
 			return type.GetMethodsAccessibleLike(method)
-					   .Where(isExactMatch)
+					   .Where(m => MethodInfoEqualityComparer.Singleton.Equals(m, method))
 					   .FirstOrDefault();
-
-			bool isExactMatch(MethodInfo mi)
-			{
-				return mi.GetParameters().SequenceEqual(method.GetParameters(), ParameterInfoEqualityComparer.Singleton)
-					&& mi.ReturnType.FullName == method.ReturnType.FullName
-					&& mi.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), GenericParameterEqualityComparer.Singleton);
-			}
 		}
+		
 		/// <summary>
 		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.
 		/// </summary>
@@ -116,13 +110,9 @@ namespace Versioning
 		private ConstructorInfo? ResolveConstructor(ConstructorInfo constructor, Type type)
 		{
 			return type.GetConstructorsAccessibleLike(constructor)
-					   .Where(isExactMatch)
+					   .Where(ctor => ConstructorInfoEqualityComparer.Singleton.Equals(ctor, constructor))
 					   .FirstOrDefault();
 
-			bool isExactMatch(ConstructorInfo ctor)
-			{
-				return ctor.GetParameters().SequenceEqual(constructor.GetParameters(), ParameterInfoEqualityComparer.Singleton);
-			}
 		}
 		/// <summary>
 		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.

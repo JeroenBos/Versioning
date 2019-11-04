@@ -64,7 +64,7 @@ namespace Versioning
 			if (type.DeclaringType != null) throw new NotImplementedException();
 
 			return assembly.GetTypes()
-						   .FirstOrDefault(t => ResolveTypeEqualityComparer.Singleton.Equals(type, t));
+						   .FirstOrDefault(t => TypeEqualityComparer.Singleton.Equals(type, t));
 		}
 		/// <summary>
 		/// Tries to find the same (by name and arity) nested type in the specified type.
@@ -72,7 +72,7 @@ namespace Versioning
 		private Type? ResolveType(Type type, Type containerType)
 		{
 			return containerType.GetNestedTypes(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-								.FirstOrDefault(t => ResolveTypeEqualityComparer.Singleton.Equals(type, t));
+								.FirstOrDefault(t => TypeEqualityComparer.Singleton.Equals(type, t));
 		}
 		/// <summary>
 		/// For simplicity for now there are no type candidates. They must simply match exactly.

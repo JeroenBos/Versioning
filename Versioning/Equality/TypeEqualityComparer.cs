@@ -8,9 +8,9 @@ namespace Versioning.Equality
 	/// <summary>
 	/// Compares types by name, arity, namespace, publicness and declaring types.
 	/// </summary>
-	public class ResolveTypeEqualityComparer : IEqualityComparer<Type>
+	public class TypeEqualityComparer : IEqualityComparer<Type>
 	{
-		public static readonly ResolveTypeEqualityComparer Singleton = new ResolveTypeEqualityComparer();
+		public static readonly TypeEqualityComparer Singleton = new TypeEqualityComparer();
 
 		public bool Equals(Type? x, Type? y)
 		{

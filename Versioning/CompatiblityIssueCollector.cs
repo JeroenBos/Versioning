@@ -90,8 +90,7 @@ namespace Versioning
 		private MethodInfo? ResolveMethod(MethodInfo method, Type type)
 		{
 			return type.GetMethodsAccessibleLike(method)
-					   .Where(m => MethodInfoEqualityComparer.Singleton.Equals(m, method))
-					   .FirstOrDefault();
+					   .FirstOrDefault(m => MethodInfoEqualityComparer.Singleton.Equals(m, method));
 		}
 		
 		/// <summary>
@@ -110,9 +109,7 @@ namespace Versioning
 		private ConstructorInfo? ResolveConstructor(ConstructorInfo constructor, Type type)
 		{
 			return type.GetConstructorsAccessibleLike(constructor)
-					   .Where(ctor => ConstructorInfoEqualityComparer.Singleton.Equals(ctor, constructor))
-					   .FirstOrDefault();
-
+					   .FirstOrDefault(ctor => ConstructorInfoEqualityComparer.Singleton.Equals(ctor, constructor));
 		}
 		/// <summary>
 		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.

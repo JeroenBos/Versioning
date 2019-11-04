@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Versioning.Equality
 {
-	class MethodInfoEqualityComparer : IEqualityComparer<MethodInfo>
+	public class MethodInfoEqualityComparer : IEqualityComparer<MethodInfo>
 	{
 		public static readonly MethodInfoEqualityComparer Singleton = new MethodInfoEqualityComparer();
 

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Versioning.Equality
 {
-	class ConstructorInfoEqualityComparer : IEqualityComparer<ConstructorInfo>
+	public class ConstructorInfoEqualityComparer : IEqualityComparer<ConstructorInfo>
 	{
 		public static readonly ConstructorInfoEqualityComparer Singleton = new ConstructorInfoEqualityComparer();
 

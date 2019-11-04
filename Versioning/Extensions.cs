@@ -173,6 +173,38 @@ namespace Versioning
 			// every other access modifier change does not affect compatibility
 			return true;
 		}
+
+		/// <summary>
+		/// Gets the members on the specified type that are visible outside of the assemby.
+		/// </summary>
+		public static IReadOnlyList<MemberInfo> GetFamilyAndPublicMembers(this Type type)
+		{
+			return type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+					   .Where(member => member.GetAccessibilityModifiers().IsFamilyOrPublic())
+					   .ToList();
+		}
+
+		/// <summary>
+		/// Gets whether the specified accessibility is visible outside of the assembly.
+		/// </summary>
+		public static bool IsFamilyOrPublic(this AccessAndStaticModifiers accessAndStaticModifiers)
+		{
+			switch (accessAndStaticModifiers & AccessAndStaticModifiers.AccessMask)
+			{
+				case AccessAndStaticModifiers.Private:
+				case AccessAndStaticModifiers.FamANDAssem:
+				case AccessAndStaticModifiers.Assembly:
+					return false;
+				case AccessAndStaticModifiers.Family:
+				case AccessAndStaticModifiers.FamORAssem:
+				case AccessAndStaticModifiers.Public:
+					return true;
+				case AccessAndStaticModifiers.Static:
+				case AccessAndStaticModifiers.None:
+				default:
+					throw new ArgumentException(nameof(accessAndStaticModifiers));
+			}
+		}
 	}
 
 	public enum AccessAndStaticModifiers

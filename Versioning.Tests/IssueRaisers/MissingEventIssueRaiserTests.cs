@@ -78,5 +78,32 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
+
+		[Test]
+		public void ProtectedEventMadePrivateIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { protected event System.Action a; }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { private event System.Action a; }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+		}
+
+
+		[Test]
+		public void InternalEventMadePrivateIsNotReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { internal event System.Action a; }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { private event System.Action a; }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
 	}
 }

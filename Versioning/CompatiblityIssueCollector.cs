@@ -48,7 +48,7 @@ namespace Versioning
 			if (otherType == null)
 				return issues;
 
-			var nestedIssues = type.GetMembers().SelectMany(memberInfo => memberInfo switch
+			var nestedIssues = type.GetFamilyAndPublicMembers().SelectMany(memberInfo => memberInfo switch
 			{
 				FieldInfo fi => GetIssuesOn(fi, this.ResolveField(fi, otherType), this.ResolveFieldCandidates(fi, otherType)),
 				PropertyInfo pi => GetIssuesOn(pi, this.ResolveProperty(pi, otherType), this.ResolvePropertyCandidates(pi, otherType)),
@@ -125,11 +125,15 @@ namespace Versioning
 		}
 
 		/// <summary>
-		/// Tries to find the exact same evet in the specified type.
+		/// Tries to find the exact same event in the specified type.
 		/// </summary>
 		private EventInfo? ResolveEvent(EventInfo @event, Type type)
 		{
-			return type.GetEvent(@event.Name); // TODO: exact match
+			var candidate = type.GetEvent(@event.Name);
+
+			if (candidate != null && EventInfoEqualityComparer.Singleton.Equals(@event, candidate))
+				return candidate;
+			return null;
 		}
 		/// <summary>
 		/// Returns all events in the specified type with the same name.
@@ -163,7 +167,11 @@ namespace Versioning
 		/// </summary>
 		private FieldInfo? ResolveField(FieldInfo field, Type type)
 		{
-			return type.GetField(field.Name); // TODO: exact match
+			var candidate = type.GetField(field.Name);
+
+			if (candidate != null && FieldInfoEqualityComparer.Singleton.Equals(field, candidate))
+				return candidate;
+			return null;
 		}
 		/// <summary>
 		/// Returns all fields in the specified type with the same name.

@@ -11,8 +11,7 @@ namespace Versioning.IssueRaisers
 		public IEnumerable<ICompatibilityIssue> Evaluate(FieldInfo field, FieldInfo? equivalent, IReadOnlyList<FieldInfo> candidates)
 		{
 			if (equivalent == null)
-				return new[] { new MissingFieldIssue(field) };
-			return Enumerable.Empty<ICompatibilityIssue>();
+				yield return new MissingFieldIssue(field);
 		}
 	}
 

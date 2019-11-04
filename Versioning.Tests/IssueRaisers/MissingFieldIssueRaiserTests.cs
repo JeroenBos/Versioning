@@ -78,5 +78,33 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
+
+		[Test]
+		public void ProtectedFieldMadePrivateIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { protected int i; }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { private int i; }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+		}
+
+
+		[Test]
+		public void InternalFieldMadePrivateIsNotReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { internal int i; }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { private int i; }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
 	}
 }

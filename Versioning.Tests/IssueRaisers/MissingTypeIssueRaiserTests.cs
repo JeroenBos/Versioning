@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using Versioning.IssueRaisers;
+using Versioning.Issues;
 
 namespace Versioning.Tests
 {

@@ -8,23 +8,4 @@ namespace Versioning
 	{
 
 	}
-	public class MissingTypeIssue : ICompatibilityIssue
-	{
-		public Type MissingType { get; }
-		public MissingTypeIssue(Type missingType)
-		{
-			if (missingType == null) throw new ArgumentNullException(nameof(missingType));
-
-			this.MissingType = missingType;
-		}
-	}
-	public class MissingMemberIssue : ICompatibilityIssue
-	{
-
-	}
-
-	public class MissingPropertyIssue : MissingMemberIssue
-	{
-
-	}
 }

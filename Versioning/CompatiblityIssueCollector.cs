@@ -61,27 +61,18 @@ namespace Versioning
 		/// </summary>
 		private Type ResolveType(Type type, Assembly assembly)
 		{
-			return assembly.GetType(type.FullName);
+			if (type.DeclaringType != null) throw new NotImplementedException();
+
+			return assembly.GetTypes()
+						   .FirstOrDefault(t => ResolveTypeEqualityComparer.Singleton.Equals(type, t));
 		}
 		/// <summary>
 		/// Tries to find the same (by name and arity) nested type in the specified type.
 		/// </summary>
 		private Type ResolveType(Type type, Type containerType)
 		{
-			return containerType.GetMember(type.Name)
-								.Where(memberInfo => memberInfo is Type)
-								.Select(t => (Type)t)
-								.Where(t => equalsByArity(type, t))
-								.FirstOrDefault();
-
-			bool equalsByArity(Type x, Type y)
-			{
-				if (!x.IsConstructedGenericType && !y.IsConstructedGenericType)
-					return true;
-				if (!y.IsConstructedGenericType)
-					return false;
-				return x.GetGenericArguments().Length == y.GetGenericArguments().Length;
-			}
+			return containerType.GetNestedTypes(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+								.FirstOrDefault(t => ResolveTypeEqualityComparer.Singleton.Equals(type, t));
 		}
 
 		/// <summary>

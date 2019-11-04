@@ -50,7 +50,7 @@ namespace Versioning
 
 		public static AssemblyLoadContext Load(
 			string sourceCode,
-			string assemblyName,
+			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
 			LanguageVersion languageVersion = LanguageVersion.CSharp8)
 		{

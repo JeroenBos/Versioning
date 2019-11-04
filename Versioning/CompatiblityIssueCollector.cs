@@ -140,7 +140,9 @@ namespace Versioning
 		/// </summary>
 		private PropertyInfo? ResolveProperty(PropertyInfo property, Type type)
 		{
-			return type.GetProperty(property.Name); // TODO: exact match
+			return type.GetPropertiesAccessibleLike(property)
+					   .Where(p => PropertyInfoEqualityComparer.Singleton.Equals(p, property))
+					   .FirstOrDefault();
 		}
 		/// <summary>
 		/// Returns all properties in the specified type with the same name.

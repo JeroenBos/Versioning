@@ -19,14 +19,14 @@ namespace Versioning
 	/// - <see cref="PropertyInfo"/>
 	/// - <see cref="EventInfo"/>
 	/// </typeparam>
-	public interface ICompatiblityIssueRaiser<in T> : ICompatiblityIssueRaiser
+	public interface ICompatiblityIssueRaiser<in T> : ICompatiblityIssueRaiser where T : class
 	{
 		/// <summary>
 		/// Gets all issues on the specified element and its resolved counterparts in the other assembly.
 		/// </summary>
 		/// <param name="element"> The assembly element on which to report issues. </param>
 		/// <param name="equivalentElements"> The resolved counterparts in the other assembly. Is empty when not found. </param>
-		IEnumerable<ICompatibilityIssue> Evaluate(T element, IReadOnlyList<T> equivalentElements);
+		IEnumerable<ICompatibilityIssue> Evaluate(T element, T? equivalentElement, IReadOnlyList<T> candidates);
 	}
 
 }

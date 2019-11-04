@@ -33,25 +33,21 @@ namespace Versioning
 
 		private IEnumerable<ICompatibilityIssue> GetIssuesOn(Type type, Type otherType)
 		{
+			var issues = GetIssuesOn(type, otherType, Array.Empty<Type>());
 			if (otherType == null)
+				return issues;
+
+			var nestedIssues = type.GetMembers().SelectMany(memberInfo => memberInfo switch
 			{
-				return GetIssuesOn(type, Array.Empty<Type>());
-			}
-			else
-			{
-				var issues = GetIssuesOn(type, new[] { otherType });
-				var nestedIssues = type.GetMembers().SelectMany(memberInfo => memberInfo switch
-				{
-					FieldInfo fi => GetIssuesOn(fi, this.ResolveField(fi, otherType)),
-					PropertyInfo pi => GetIssuesOn(pi, this.ResolveProperty(pi, otherType)),
-					ConstructorInfo ci => GetIssuesOn(ci, this.ResolveConstructor(ci, otherType)),
-					MethodInfo mi => GetIssuesOn(mi, this.ResolveMethod(mi, otherType)),
-					EventInfo ei => GetIssuesOn(ei, this.ResolveEvent(ei, otherType)),
-					Type nt => GetIssuesOn(nt, this.ResolveType(nt, otherType)),
-					_ => throw new Exception()
-				});
-				return issues.Concat(nestedIssues);
-			}
+				FieldInfo fi => GetIssuesOn(fi, this.ResolveField(fi, otherType), this.ResolveFieldCandidates(fi, otherType)),
+				PropertyInfo pi => GetIssuesOn(pi, this.ResolveProperty(pi, otherType), this.ResolvePropertyCandidates(pi, otherType)),
+				ConstructorInfo ci => GetIssuesOn(ci, this.ResolveConstructor(ci, otherType), this.ResolveConstructorCandidates(ci, otherType)),
+				MethodInfo mi => GetIssuesOn(mi, this.ResolveMethod(mi, otherType), this.ResolveMethodCandidates(mi, otherType)),
+				EventInfo ei => GetIssuesOn(ei, this.ResolveEvent(ei, otherType), this.ResolveEventCandidates(ei, otherType)),
+				Type nt => GetIssuesOn(nt, this.ResolveType(nt, otherType)),
+				_ => throw new Exception()
+			});
+			return issues.Concat(nestedIssues);
 		}
 
 		/// <summary>
@@ -61,7 +57,6 @@ namespace Versioning
 		{
 			return assembly.GetType(type.FullName);
 		}
-
 		/// <summary>
 		/// Tries to find the same (by name and arity) nested type in the specified type.
 		/// </summary>
@@ -84,21 +79,13 @@ namespace Versioning
 		}
 
 		/// <summary>
-		/// Tries to find the same method in the specified type.
-		/// If there is one perfect match, returns that one; otherwise all methods with the same name and public, protected and static modifiers.
+		/// Tries to find the exact same method in the specified type.
 		/// </summary>
-		private IReadOnlyList<MethodInfo> ResolveMethod(MethodInfo method, Type type)
+		private MethodInfo? ResolveMethod(MethodInfo method, Type type)
 		{
-			var exactMatch = type.GetMethodsAccessibleLike(method)
-								 .Where(isExactMatch)
-								 .ToList();
-
-			if (exactMatch.Count != 0)
-				return exactMatch;
-
 			return type.GetMethodsAccessibleLike(method)
-					   .Where(mi => mi.Name == method.Name)
-					   .ToList();
+					   .Where(isExactMatch)
+					   .FirstOrDefault();
 
 			bool isExactMatch(MethodInfo mi)
 			{
@@ -107,63 +94,90 @@ namespace Versioning
 					&& mi.GetGenericArguments().SequenceEqual(method.GetGenericArguments(), GenericParameterEqualityComparer.Singleton);
 			}
 		}
+		/// <summary>
+		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.
+		/// </summary>
+		private IReadOnlyList<MethodInfo> ResolveMethodCandidates(MethodInfo method, Type type)
+		{
+			return type.GetMethodsAccessibleLike(method)
+					   .Where(mi => mi.Name == method.Name)
+					   .ToList();
+		}
 
 		/// <summary>
-		/// Tries to find the same constructor in the specified type. 
-		/// If there is one perfect match, returns that one; otherwise all constructors with the same public, protected and static modifiers.
+		/// Tries to find the exact same method in the specified type.
 		/// </summary>
-		private IReadOnlyList<ConstructorInfo> ResolveConstructor(ConstructorInfo constructor, Type type)
+		private ConstructorInfo? ResolveConstructor(ConstructorInfo constructor, Type type)
 		{
-			var exactMatch = type.GetConstructorsAccessibleLike(constructor)
-								 .Where(isExactMatch)
-								 .ToList();
-
-			if (exactMatch.Count != 0)
-				return exactMatch;
-
-			return type.GetConstructorsAccessibleLike(constructor).ToList();
-
+			return type.GetConstructorsAccessibleLike(constructor)
+					   .Where(isExactMatch)
+					   .FirstOrDefault();
 
 			bool isExactMatch(ConstructorInfo ctor)
 			{
 				return ctor.GetParameters().SequenceEqual(constructor.GetParameters(), ParameterInfoEqualityComparer.Singleton);
 			}
 		}
-
 		/// <summary>
-		/// Tries to find the same event in the specified type.
+		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.
 		/// </summary>
-		private IReadOnlyList<EventInfo> ResolveEvent(EventInfo @event, Type type)
+		private IReadOnlyList<ConstructorInfo> ResolveConstructorCandidates(ConstructorInfo ctor, Type type)
 		{
-			var eventInfo = type.GetEvent(@event.Name);
-			return eventInfo == null ? Array.Empty<EventInfo>() : new[] { eventInfo };
+			return type.GetConstructorsAccessibleLike(ctor)
+					   .Where(mi => mi.Name == ctor.Name)
+					   .ToList();
 		}
 
 		/// <summary>
-		/// Tries to find the same property in the specified type.
+		/// Tries to find the exact same evet in the specified type.
 		/// </summary>
-		private IReadOnlyList<PropertyInfo> ResolveProperty(PropertyInfo property, Type type)
+		private EventInfo? ResolveEvent(EventInfo @event, Type type)
 		{
-			var propertyInfo = type.GetProperty(property.Name);
-			return propertyInfo == null ? Array.Empty<PropertyInfo>() : new[] { propertyInfo };
+			return type.GetEvent(@event.Name); // TODO: exact match
+		}
+		/// <summary>
+		/// Returns all events in the specified type with the same name.
+		/// </summary>
+		private IReadOnlyList<EventInfo> ResolveEventCandidates(EventInfo @event, Type type)
+		{
+			return new[] { type.GetEvent(@event.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
 		}
 
 		/// <summary>
-		/// Tries to find the same field in the specified type.
+		/// Tries to find the exact same property in the specified type.
 		/// </summary>
-		private IReadOnlyList<FieldInfo> ResolveField(FieldInfo field, Type type)
+		private PropertyInfo? ResolveProperty(PropertyInfo property, Type type)
 		{
-			var fieldInfo = type.GetField(field.Name);
-			return fieldInfo == null ? Array.Empty<FieldInfo>() : new[] { fieldInfo };
+			return type.GetProperty(property.Name); // TODO: exact match
+		}
+		/// <summary>
+		/// Returns all properties in the specified type with the same name.
+		/// </summary>
+		private IReadOnlyList<PropertyInfo> ResolvePropertyCandidates(PropertyInfo property, Type type)
+		{
+			return new[] { type.GetProperty(property.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
 		}
 
+		/// <summary>
+		/// Tries to find the same exact field in the specified type.
+		/// </summary>
+		private FieldInfo? ResolveField(FieldInfo field, Type type)
+		{
+			return type.GetField(field.Name); // TODO: exact match
+		}
+		/// <summary>
+		/// Returns all fields in the specified type with the same name.
+		/// </summary>
+		private IReadOnlyList<FieldInfo> ResolveFieldCandidates(FieldInfo field, Type type)
+		{
+			return new[] { type.GetField(field.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
+		}
 
-		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, IReadOnlyList<T> equivalentElements) where T : class
+		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, T? equivalentElement, IReadOnlyList<T> candidates) where T : class
 		{
 			return this.GetIssueRaisers<T>()
-					   .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElements));
+					   .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
 		}
-
 		private IEnumerable<ICompatiblityIssueRaiser<T>> GetIssueRaisers<T>() where T : class
 		{
 			foreach (var raiser in this.IssueRaisers)

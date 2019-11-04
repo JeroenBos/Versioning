@@ -5,17 +5,29 @@ using System.Text;
 
 namespace Versioning.Issues
 {
-	public class MissingPropertyOrAccessorIssue : ICompatibilityIssue
+	public class MissingPropertyIssue : ICompatibilityIssue
 	{
 		public PropertyInfo Property { get; }
-		public PropertyAccessor MissingAccessors { get; }
-		public MissingPropertyOrAccessorIssue(PropertyInfo property, PropertyAccessor missingAccessors)
+		public MissingPropertyIssue(PropertyInfo property)
 		{
 			if (property == null) throw new ArgumentNullException(nameof(property));
 
 			this.Property = property;
-			this.MissingAccessors = missingAccessors;
 		}
+	}
+
+
+	public class MissingAccessorIssue : MissingMethodIssue
+	{
+		public PropertyAccessor Accessor { get; }
+		public PropertyInfo Property { get; }
+		public MissingAccessorIssue(PropertyInfo property, PropertyAccessor missingAccessor)
+			: base(property.Select(missingAccessor) ?? throw new ArgumentException("The accessor does not exist"))
+		{
+			this.Property = property;
+			this.Accessor = missingAccessor;
+		}
+
 	}
 
 	[Flags]
@@ -39,5 +51,17 @@ namespace Versioning.Issues
 		{
 			return (int)_accessor - accessor;
 		}
+		public static MethodInfo? Select(this PropertyInfo property, PropertyAccessor accessor)
+		{
+			if (accessor != PropertyAccessor.Get && accessor != PropertyAccessor.Set)
+				throw new ArgumentException(nameof(accessor));
+
+			if (accessor == PropertyAccessor.Get)
+				return property.GetMethod;
+			else
+				return property.SetMethod;
+		}
 	}
+
+
 }

@@ -23,7 +23,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.AreEqual(PropertyAccessor.Get, ((MissingPropertyOrAccessorIssue)issues[0]).MissingAccessors);
+			Assert.IsAssignableFrom<MissingPropertyIssue>(issues[0]);
 		}
 
 		[Test]
@@ -37,7 +37,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.AreEqual(PropertyAccessor.Get, ((MissingPropertyOrAccessorIssue)issues[0]).MissingAccessors);
+			Assert.IsAssignableFrom<MissingPropertyIssue>(issues[0]);
 		}
 
 		[Test]
@@ -51,7 +51,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.AreEqual(PropertyAccessor.Get, ((MissingPropertyOrAccessorIssue)issues[0]).MissingAccessors);
+			Assert.AreEqual(PropertyAccessor.Get, ((MissingAccessorIssue)issues[0]).Accessor);
 		}
 		[Test]
 		public void MissingSetterIsReported()
@@ -64,7 +64,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.AreEqual(PropertyAccessor.Set, ((MissingPropertyOrAccessorIssue)issues[0]).MissingAccessors);
+			Assert.AreEqual(PropertyAccessor.Set, ((MissingAccessorIssue)issues[0]).Accessor);
 		}
 
 		[Test]
@@ -119,6 +119,50 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(0, issues.Count);
+		}
+
+
+		[Test]
+		public void AccessorMadePrivateIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int P { get; set; } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int P { get; private set; } }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual(PropertyAccessor.Set, ((MissingAccessorIssue)issues[0]).Accessor);
+		}
+
+		[Test]
+		public void AccessorMadeProtectedIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int P { get; set; } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int P { get; protected set; } }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual(PropertyAccessor.Set, ((MissingAccessorIssue)issues[0]).Accessor);
+		}
+
+
+		[Test]
+		public void AccessorMadePrivateFromProtectedIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int P { get; protected set; } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int P { get; private set; } }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.IsTrue(((MissingMethodIssue)issues[0]).MissingMethod.Name.StartsWith("set"));
 		}
 	}
 }

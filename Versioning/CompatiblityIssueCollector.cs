@@ -12,6 +12,11 @@ namespace Versioning
 	/// - List every public member from a linked assembly, A, (with major version n<m) used within another assembly, B, by analyzing B
 	/// - Check whether there's anything in the second list that's not in the first. 
 	///   If there isn't, B is probably compatible with A (v=m), and any assembly depending on B will be okay when it references A (v=m) itself.
+	///   
+	/// Btw, the strategy I've chosen is to divide this into two problems: 
+	/// 1) list all differences between two assembly version (i.e. versions n and m from assembly A)
+	/// 2) filter that list of differences based on usage by another assembly, i.e. B.
+	/// I'm working on 1) now
 	/// </summary>
 	public class CompatiblityIssueCollector
 	{

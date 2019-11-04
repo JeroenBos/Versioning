@@ -67,7 +67,7 @@ namespace Versioning.Tests
 		}
 
 		[Test]
-		public void FieldOnMissingTypeIsReported()
+		public void FieldOnMissingTypeIsNotReported()
 		{
 			// arrange
 			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();

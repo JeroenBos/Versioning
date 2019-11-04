@@ -7,9 +7,9 @@ namespace Versioning.Tests
 {
 	public static class Extensions
 	{
-		public static CompatiblityIssueRaiserVisitor ToSingleton<T>(this ICompatiblityIssueRaiser<T> raiser) where T : MemberInfo
+		public static CompatiblityIssueCollector ToSingleton<T>(this ICompatiblityIssueRaiser<T> raiser) where T : MemberInfo
 		{
-			return new CompatiblityIssueRaiserVisitor(new ICompatiblityIssueRaiser[] { raiser });
+			return new CompatiblityIssueCollector(new ICompatiblityIssueRaiser[] { raiser });
 		}
 	}
 }

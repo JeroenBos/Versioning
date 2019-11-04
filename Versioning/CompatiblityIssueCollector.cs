@@ -13,10 +13,10 @@ namespace Versioning
 	/// - Check whether there's anything in the second list that's not in the first. 
 	///   If there isn't, B is probably compatible with A (v=m), and any assembly depending on B will be okay when it references A (v=m) itself.
 	/// </summary>
-	public class CompatiblityIssueRaiserVisitor
+	public class CompatiblityIssueCollector
 	{
 		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
-		public CompatiblityIssueRaiserVisitor(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers)
+		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers)
 		{
 			if (issueRaisers == null) throw new ArgumentNullException(nameof(issueRaisers));
 

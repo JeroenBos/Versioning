@@ -41,5 +41,22 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
+
+
+		[Test]
+		public void TypeMadeInternalIsResported()
+		{
+			/// the difference with <see cref="MissingTypeIsReported"/> is the assembly contents are reversed
+
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
+			var raiser = new MissingTypeIssueRaiser().ToSingleton();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+		}
 	}
 }

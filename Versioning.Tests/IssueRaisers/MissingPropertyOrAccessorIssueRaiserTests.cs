@@ -45,7 +45,7 @@ namespace Versioning.Tests
 		{
 			// arrange
 			Assembly a = AssemblyGenerator.Load("public class A { public int P { get; set; } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public int P { get; } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int P { set { } } }").Assemblies.First();
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -58,7 +58,7 @@ namespace Versioning.Tests
 		{
 			// arrange
 			Assembly a = AssemblyGenerator.Load("public class A { public int P { get; set; } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public int P { set; } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int P { get; } }").Assemblies.First();
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

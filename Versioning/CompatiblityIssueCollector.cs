@@ -90,7 +90,7 @@ namespace Versioning
 			return type.GetMethodsAccessibleLike(method)
 					   .FirstOrDefault(m => MethodInfoEqualityComparer.Singleton.Equals(m, method));
 		}
-		
+
 		/// <summary>
 		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.
 		/// </summary>
@@ -131,7 +131,8 @@ namespace Versioning
 		/// </summary>
 		private IReadOnlyList<EventInfo> ResolveEventCandidates(EventInfo @event, Type type)
 		{
-			return new[] { type.GetEvent(@event.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
+			return type.GetEvent(@event.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				       .ToSingletonListIfNotNull();
 		}
 
 		/// <summary>
@@ -146,7 +147,8 @@ namespace Versioning
 		/// </summary>
 		private IReadOnlyList<PropertyInfo> ResolvePropertyCandidates(PropertyInfo property, Type type)
 		{
-			return new[] { type.GetProperty(property.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
+			return type.GetProperty(property.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				       .ToSingletonListIfNotNull();
 		}
 
 		/// <summary>
@@ -161,7 +163,8 @@ namespace Versioning
 		/// </summary>
 		private IReadOnlyList<FieldInfo> ResolveFieldCandidates(FieldInfo field, Type type)
 		{
-			return new[] { type.GetField(field.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
+			return type.GetField(field.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				       .ToSingletonListIfNotNull();
 		}
 
 		/// <summary>

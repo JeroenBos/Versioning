@@ -18,6 +18,15 @@ namespace Versioning
 			yield return element;
 		}
 
+		/// <summary> Creates a list out of a single specified element if it is not null; returns the empty sequence otherwise. </summary>
+		[DebuggerHidden]
+		public static IReadOnlyList<T> ToSingletonListIfNotNull<T>(this T element) where T : class
+		{
+			if (element != null)
+				return new[] { element };
+			return Array.Empty<T>();
+		}
+
 		/// <summary>
 		/// Gets the bindingflags for public and static, if present on the specified info.
 		/// </summary>

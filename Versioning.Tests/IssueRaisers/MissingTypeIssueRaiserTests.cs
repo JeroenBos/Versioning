@@ -10,13 +10,14 @@ namespace Versioning.Tests
 {
 	public class MissingTypeIssueRaiserTests
 	{
+		private CompatiblityIssueCollector raiser = new MissingTypeIssueRaiser().ToSingleton();
+
 		[Test]
 		public void MissingTypeIsReported()
 		{
 			// arrange
 			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
 			Assembly b = AssemblyGenerator.Load("").Assemblies.First();
-			var raiser = new MissingTypeIssueRaiser().ToSingleton();
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -35,7 +36,6 @@ namespace Versioning.Tests
 			// arrange
 			Assembly a = AssemblyGenerator.Load("").Assemblies.First();
 			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
-			var raiser = new MissingTypeIssueRaiser().ToSingleton();
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -45,14 +45,11 @@ namespace Versioning.Tests
 
 
 		[Test]
-		public void TypeMadeInternalIsResported()
+		public void TypeMadeInternalIsReported()
 		{
-			/// the difference with <see cref="MissingTypeIsReported"/> is the assembly contents are reversed
-
 			// arrange
 			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
 			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
-			var raiser = new MissingTypeIssueRaiser().ToSingleton();
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

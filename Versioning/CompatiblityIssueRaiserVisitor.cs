@@ -6,6 +6,13 @@ using System.Linq;
 
 namespace Versioning
 {
+	/// <summary>
+	/// So initially the goals are:
+	/// - List every public member (class, struct, interface, method, property etc) present in an assembly, A, with major version m
+	/// - List every public member from a linked assembly, A, (with major version n<m) used within another assembly, B, by analyzing B
+	/// - Check whether there's anything in the second list that's not in the first. 
+	///   If there isn't, B is probably compatible with A (v=m), and any assembly depending on B will be okay when it references A (v=m) itself.
+	/// </summary>
 	public class CompatiblityIssueRaiserVisitor
 	{
 		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
@@ -17,11 +24,7 @@ namespace Versioning
 		}
 
 		/// <summary>
-		/// So initially the goals are:
-		/// - List every public member (class, struct, interface, method, property etc) present in an assembly, A, with major version m
-		/// - List every public member from a linked assembly, A, (with major version n<m) used within another assembly, B, by analyzing B
-		/// - Check whether there's anything in the second list that's not in the first. 
-		///   If there isn't, B is probably compatible with A (v=m), and any assembly depending on B will be okay when it references A (v=m) itself.
+		/// Returns all compatibility issues between the specified assemblies, as raised by <see cref="IssueRaisers"/>.
 		/// </summary>
 		public IEnumerable<ICompatibilityIssue> GetCompatibilityIssuesBetween(Assembly assembly, Assembly sameAssemblyLowerVersion)
 		{
@@ -31,6 +34,9 @@ namespace Versioning
 			return assembly.GetTypes().SelectMany(type => GetIssuesOn(type, this.ResolveType(type, sameAssemblyLowerVersion)));
 		}
 
+		/// <summary>
+		/// Traverses the type system and collects all raised issues.
+		/// </summary>
 		private IEnumerable<ICompatibilityIssue> GetIssuesOn(Type type, Type otherType)
 		{
 			var issues = GetIssuesOn(type, otherType, Array.Empty<Type>());
@@ -173,11 +179,18 @@ namespace Versioning
 			return new[] { type.GetField(field.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) };
 		}
 
+		/// <summary>
+		/// Gets the issues raised by the issue raisers applicable on <paramref name="element"/>, 
+		/// given the resolved equivalent of the element in the other assembly, and candidates.
+		/// </summary>
 		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, T? equivalentElement, IReadOnlyList<T> candidates) where T : class
 		{
 			return this.GetIssueRaisers<T>()
 					   .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
 		}
+		/// <summary>
+		/// Gets the issue raisers applicable on <typeparamref name="T"/>.
+		/// </summary>
 		private IEnumerable<ICompatiblityIssueRaiser<T>> GetIssueRaisers<T>() where T : class
 		{
 			foreach (var raiser in this.IssueRaisers)

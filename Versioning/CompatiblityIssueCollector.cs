@@ -31,15 +31,15 @@ namespace Versioning
 			if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 			if (sameAssemblyLowerVersion == null) throw new ArgumentNullException(nameof(sameAssemblyLowerVersion));
 
-			return assembly.GetTypes().SelectMany(type => GetIssuesOn(type, this.ResolveType(type, sameAssemblyLowerVersion)));
+			return assembly.GetTypes().SelectMany(type => GetIssuesOn(type, this.ResolveType(type, sameAssemblyLowerVersion), Array.Empty<Type>()));
 		}
 
 		/// <summary>
 		/// Traverses the type system and collects all raised issues.
 		/// </summary>
-		private IEnumerable<ICompatibilityIssue> GetIssuesOn(Type type, Type otherType)
+		private IEnumerable<ICompatibilityIssue> GetIssuesOn(Type type, Type? otherType, IReadOnlyList<Type> candidates)
 		{
-			var issues = GetIssuesOn(type, otherType, Array.Empty<Type>());
+			var issues = GetIssuesOn<Type>(type, otherType, candidates);
 			if (otherType == null)
 				return issues;
 
@@ -50,7 +50,7 @@ namespace Versioning
 				ConstructorInfo ci => GetIssuesOn(ci, this.ResolveConstructor(ci, otherType), this.ResolveConstructorCandidates(ci, otherType)),
 				MethodInfo mi => GetIssuesOn(mi, this.ResolveMethod(mi, otherType), this.ResolveMethodCandidates(mi, otherType)),
 				EventInfo ei => GetIssuesOn(ei, this.ResolveEvent(ei, otherType), this.ResolveEventCandidates(ei, otherType)),
-				Type nt => GetIssuesOn(nt, this.ResolveType(nt, otherType)),
+				Type nt => GetIssuesOn(nt, this.ResolveType(nt, otherType), this.ResolveTypeCandidates(nt, otherType)),
 				_ => throw new Exception()
 			});
 			return issues.Concat(nestedIssues);
@@ -59,7 +59,7 @@ namespace Versioning
 		/// <summary>
 		/// Tries to find the same type in the specified assembly.
 		/// </summary>
-		private Type ResolveType(Type type, Assembly assembly)
+		private Type? ResolveType(Type type, Assembly assembly)
 		{
 			if (type.DeclaringType != null) throw new NotImplementedException();
 
@@ -69,10 +69,17 @@ namespace Versioning
 		/// <summary>
 		/// Tries to find the same (by name and arity) nested type in the specified type.
 		/// </summary>
-		private Type ResolveType(Type type, Type containerType)
+		private Type? ResolveType(Type type, Type containerType)
 		{
 			return containerType.GetNestedTypes(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
 								.FirstOrDefault(t => ResolveTypeEqualityComparer.Singleton.Equals(type, t));
+		}
+		/// <summary>
+		/// For simplicity for now there are no type candidates. They must simply match exactly.
+		/// </summary>
+		private IReadOnlyList<Type> ResolveTypeCandidates(Type type, Type containerType)
+		{
+			return Array.Empty<Type>();
 		}
 
 		/// <summary>

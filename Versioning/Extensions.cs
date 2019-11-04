@@ -30,7 +30,7 @@ namespace Versioning
 		/// <summary>
 		/// Gets the bindingflags for public/nonpublic and static/instance of the specified member info.
 		/// </summary>
-		public static BindingFlags GetAccessModifiers(this MemberInfo info)
+		public static BindingFlags GetAccessibilityBindingFlags(this MemberInfo info)
 		{
 			if (info == null) throw new ArgumentNullException(nameof(info));
 
@@ -50,7 +50,7 @@ namespace Versioning
 		/// </summary>
 		public static IEnumerable<MethodInfo> GetMethodsAccessibleLike(this Type type, MethodBase info)
 		{
-			var all = type.GetMethods(info.GetAccessModifiers());
+			var all = type.GetMethods(info.GetAccessibilityBindingFlags());
 			if (info.IsFamily)
 				return all.Where(m => m.IsFamily);
 			else
@@ -61,7 +61,7 @@ namespace Versioning
 		/// </summary>
 		public static IEnumerable<ConstructorInfo> GetConstructorsAccessibleLike(this Type type, MethodBase info)
 		{
-			var all = type.GetConstructors(info.GetAccessModifiers());
+			var all = type.GetConstructors(info.GetAccessibilityBindingFlags());
 			if (info.IsFamily)
 				return all.Where(m => m.IsFamily);
 			else
@@ -73,7 +73,7 @@ namespace Versioning
 		/// </summary>
 		public static IEnumerable<PropertyInfo> GetPropertiesAccessibleLike(this Type type, PropertyInfo info)
 		{
-			var all = type.GetProperties(info.GetAccessModifiers());
+			var all = type.GetProperties(info.GetAccessibilityBindingFlags());
 			if (info.IsFamily())
 				return all.Where(IsFamily);
 			else

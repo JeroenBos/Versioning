@@ -164,5 +164,49 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 			Assert.IsTrue(((MissingMethodIssue)issues[0]).MissingMethod.Name.StartsWith("set"));
 		}
+
+		[Test]
+		public void MissingIndexerIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int this[object obj] => 0; }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.IsAssignableFrom<MissingPropertyIssue>(issues[0]);
+		}
+		public class A { public int this[object obj] { get => 0;  set { } } }
+
+		[Test]
+		public void MissingIndexerGetterIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int this[object obj] { get => 0;  set { } } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int this[object obj] { set { } } }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual(PropertyAccessor.Get, ((MissingAccessorIssue)issues[0]).Accessor);
+		}
+		[Test]
+		public void MissingIndexerSetterIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int this[object obj] { get => 0;  set { } } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { public int this[object obj] { get => 0; } }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual(PropertyAccessor.Set, ((MissingAccessorIssue)issues[0]).Accessor);
+		}
+		// TODO: indexer overload testing
+
 	}
 }

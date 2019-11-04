@@ -6,7 +6,7 @@ using System.Linq;
 namespace Versioning.Equality
 {
 	/// <summary>
-	/// Compares types by name, arity, namespace and declaring types.
+	/// Compares types by name, arity, namespace, publicness and declaring types.
 	/// </summary>
 	public class ResolveTypeEqualityComparer : IEqualityComparer<Type>
 	{
@@ -25,6 +25,7 @@ namespace Versioning.Equality
 			return x!.Name == y!.Name
 				&& x.Namespace == y.Namespace
 				&& x.GetGenericArguments().Length == y.GetGenericArguments().Length
+				&& x.IsPublic == y.IsPublic
 				&& Equals(x.DeclaringType, y.DeclaringType);
 		}
 

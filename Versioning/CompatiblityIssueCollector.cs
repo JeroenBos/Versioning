@@ -31,12 +31,12 @@ namespace Versioning
 		/// <summary>
 		/// Returns all compatibility issues between the specified assemblies, as raised by <see cref="IssueRaisers"/>.
 		/// </summary>
-		public IEnumerable<ICompatibilityIssue> GetCompatibilityIssuesBetween(Assembly assembly, Assembly sameAssemblyLowerVersion)
+		public IEnumerable<ICompatibilityIssue> GetCompatibilityIssuesBetween(Assembly assembly, Assembly assemblyHigherVersion)
 		{
 			if (assembly == null) throw new ArgumentNullException(nameof(assembly));
-			if (sameAssemblyLowerVersion == null) throw new ArgumentNullException(nameof(sameAssemblyLowerVersion));
+			if (assemblyHigherVersion == null) throw new ArgumentNullException(nameof(assemblyHigherVersion));
 
-			return assembly.GetTypes().SelectMany(type => GetIssuesOn(type, this.ResolveType(type, sameAssemblyLowerVersion), Array.Empty<Type>()));
+			return assembly.GetTypes().SelectMany(type => GetIssuesOn(type, this.ResolveType(type, assemblyHigherVersion), Array.Empty<Type>()));
 		}
 
 		/// <summary>

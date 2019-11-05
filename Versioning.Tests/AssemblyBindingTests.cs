@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,6 +27,11 @@ namespace Versioning.Tests
 			const string sourceCode = @"public class B : A { }";
 			var assemblies = AssemblyGenerator.LoadAssemblyWithReference(referencedSourceCode, sourceCode).Assemblies.ToList();
 			Assert.AreEqual(2, assemblies.Count);
+
+			// runtime test:
+			var b = assemblies[1].GetTypes()[0].GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
+			Assert.IsNotNull(b);
+			Assert.AreEqual("B", b.GetType().Name);
 		}
 
 	}

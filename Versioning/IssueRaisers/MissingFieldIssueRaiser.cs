@@ -8,9 +8,9 @@ namespace Versioning.IssueRaisers
 {
 	public class MissingFieldIssueRaiser : ICompatiblityIssueRaiser<FieldInfo>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(FieldInfo field, FieldInfo? equivalent, IReadOnlyList<FieldInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(FieldInfo field, FieldInfo? resolved, IReadOnlyList<FieldInfo> candidates)
 		{
-			if (equivalent == null)
+			if (resolved == null)
 				yield return new MissingFieldIssue(field);
 		}
 	}

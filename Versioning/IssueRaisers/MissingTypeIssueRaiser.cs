@@ -7,9 +7,9 @@ namespace Versioning.IssueRaisers
 {
 	public class MissingTypeIssueRaiser : ICompatiblityIssueRaiser<Type>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(Type type, Type? equivalent, IReadOnlyList<Type> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(Type type, Type? resolved, IReadOnlyList<Type> candidates)
 		{
-			if (equivalent == null)
+			if (resolved == null)
 				return new[] { new MissingTypeIssue(type) };
 			return Enumerable.Empty<ICompatibilityIssue>();
 		}

@@ -8,9 +8,9 @@ namespace Versioning.IssueRaisers
 {
 	public class MissingEventIssueRaiser : ICompatiblityIssueRaiser<EventInfo>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(EventInfo @event, EventInfo? equivalent, IReadOnlyList<EventInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(EventInfo @event, EventInfo? resolved, IReadOnlyList<EventInfo> candidates)
 		{
-			if (equivalent == null)
+			if (resolved == null)
 				yield return new MissingEventIssue(@event);
 		}
 	}

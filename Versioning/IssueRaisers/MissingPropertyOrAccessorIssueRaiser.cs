@@ -8,9 +8,9 @@ namespace Versioning.IssueRaisers
 {
 	public class MissingPropertyOrAccessorIssueRaiser : ICompatiblityIssueRaiser<PropertyInfo>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(PropertyInfo property, PropertyInfo? equivalent, IReadOnlyList<PropertyInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(PropertyInfo property, PropertyInfo? resolved, IReadOnlyList<PropertyInfo> candidates)
 		{
-			if (equivalent != null)
+			if (resolved != null)
 				yield break;
 
 			if (candidates.Count == 0

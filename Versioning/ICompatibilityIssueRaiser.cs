@@ -25,8 +25,11 @@ namespace Versioning
 		/// Gets all issues on the specified element and its resolved counterparts in the other assembly.
 		/// </summary>
 		/// <param name="element"> The assembly element on which to report issues. </param>
-		/// <param name="equivalentElements"> The resolved counterparts in the other assembly. Is empty when not found. </param>
-		IEnumerable<ICompatibilityIssue> Evaluate(T element, T? equivalentElement, IReadOnlyList<T> candidates);
+		/// <param name="resolvedElement"> The resolved counterpart in the other assembly. Is null when not found. 
+		/// Note that it not being null doesn't guarantee there is no possible binary compatibility issue; this is just
+		/// the element that would be resolved. </param>
+		/// <param name="candidates"> The assembly elements in the other assembly that almost matched. </param>
+		IEnumerable<ICompatibilityIssue> Evaluate(T element, T? resolvedElement, IReadOnlyList<T> candidates);
 	}
 
 }

@@ -8,9 +8,9 @@ namespace Versioning.IssueRaisers
 {
 	public class MissingMethodIssueRaiser : ICompatiblityIssueRaiser<MethodInfo>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(MethodInfo method, MethodInfo? equivalent, IReadOnlyList<MethodInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(MethodInfo method, MethodInfo? resolved, IReadOnlyList<MethodInfo> candidates)
 		{
-			if (equivalent != null)
+			if (resolved != null)
 				yield break;
 
 			if (candidates.Count == 0

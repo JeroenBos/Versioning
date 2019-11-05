@@ -101,7 +101,7 @@ namespace Versioning
 		private MethodInfo? ResolveMethod(MethodInfo method, Type type)
 		{
 			return type.GetMethodsAccessibleLike(method)
-					   .FirstOrDefault(m => MethodInfoEqualityComparer.Singleton.Equals(m, method));
+					   .FirstOrDefault(m => MethodResolutionEqualityComparer.Singleton.Equals(m, method));
 		}
 
 		/// <summary>

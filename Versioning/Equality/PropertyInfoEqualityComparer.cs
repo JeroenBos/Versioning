@@ -24,9 +24,9 @@ namespace Versioning.Equality
 			if (xSetter == null ^ ySetter == null)
 				return false;
 
-			if (xGetter != null && !MethodInfoEqualityComparer.Singleton.Equals(xGetter, yGetter!))
+			if (xGetter != null && !MethodResolutionEqualityComparer.Singleton.Equals(xGetter, yGetter!))
 				return false;
-			return xSetter != null && MethodInfoEqualityComparer.Singleton.Equals(xSetter, ySetter!);
+			return xSetter != null && MethodResolutionEqualityComparer.Singleton.Equals(xSetter, ySetter!);
 		}
 
 		public int GetHashCode(PropertyInfo obj) => throw new NotImplementedException();

@@ -27,7 +27,6 @@ namespace Versioning.Tests
 			Assert.AreEqual("A", ((MissingTypeIssue)issues[0]).MissingType.FullName);
 		}
 
-
 		[Test]
 		public void NewTypeInNewAssemblyIsNotReported()
 		{
@@ -42,7 +41,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
-
 
 		[Test]
 		public void TypeMadeInternalIsReported()
@@ -82,6 +80,61 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(1, issues.Count);
 
+		}
+
+		[Test]
+		public void MissingNestedDelegateIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public delegate void D(); }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual("D", ((MissingTypeIssue)issues[0]).MissingType.Name);
+		}
+
+		[Test]
+		public void NestedStructMadeInternalIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public struct S { } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { internal struct S { }}").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual("S", ((MissingTypeIssue)issues[0]).MissingType.Name);
+		}
+
+		[Test]
+		public void NestedStructMadeProtectedIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public struct S { } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { protected struct S { }}").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.AreEqual("S", ((MissingTypeIssue)issues[0]).MissingType.Name);
+		}
+
+		[Test]
+		public void NestedProtectedStructMadeProtectedInternalIsNotReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { protected struct S { } }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public class A { protected internal struct S { }}").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
 		}
 	}
 }

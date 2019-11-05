@@ -13,7 +13,7 @@ namespace Versioning.Equality
 			if (x == null) throw new ArgumentNullException(nameof(x));
 			if (y == null) throw new ArgumentNullException(nameof(y));
 
-			if (!TypeEqualityComparer.Singleton.Equals(x.EventHandlerType, y.EventHandlerType))
+			if (!TypeResolutionEqualityComparer.Singleton.Equals(x.EventHandlerType, y.EventHandlerType))
 				return false;
 
 			if (x.GetAccessAndStaticModifiers() != y.GetAccessAndStaticModifiers())

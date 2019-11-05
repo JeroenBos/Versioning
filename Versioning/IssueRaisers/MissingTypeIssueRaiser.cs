@@ -10,8 +10,19 @@ namespace Versioning.IssueRaisers
 		public IEnumerable<ICompatibilityIssue> Evaluate(Type type, Type? resolved, IReadOnlyList<Type> candidates)
 		{
 			if (resolved == null)
-				return new[] { new MissingTypeIssue(type) };
-			return Enumerable.Empty<ICompatibilityIssue>();
+			{
+				yield return new MissingTypeIssue(type);
+			}
+			else
+			{
+				var accessibility = type.GetAccessAndStaticModifiers();
+				var resolvedAccessibility = resolved.GetAccessAndStaticModifiers();
+				if (!accessibility.AccessModifierChangeIsAllowedTo(resolvedAccessibility))
+				{
+					// TODO: return more specified issue?
+					yield return new MissingTypeIssue(type);
+				}
+			}
 		}
 	}
 }

@@ -84,5 +84,29 @@ namespace Versioning
 			context.LoadFromStream(assemblyStream);
 			return context;
 		}
+
+		/// <summary>
+		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
+		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
+		/// </summary>
+		public static AssemblyLoadContext LoadAssemblyWithReferenceAgainstDifferenceVersion(
+			string referencedAssemblySourceCode,
+			string referencedAssemblySourceCodev2,
+			string sourceCode,
+			string referencedAssemblyName = "defaultReferencedAssemblyName",
+			string assemblyName = "defaultAssemblyName")
+		{
+			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
+			
+			referencedAssemblySourceCodev2 = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]" + referencedAssemblySourceCodev2;
+
+			CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
+			var referencedAssemblyRuntime = CreateAssembly(referencedAssemblySourceCodev2, referencedAssemblyName, out var _);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, references: new[] { reference });
+
+			context.LoadFromStream(referencedAssemblyRuntime);
+			context.LoadFromStream(assemblyStream);
+			return context;
+		}
 	}
 }

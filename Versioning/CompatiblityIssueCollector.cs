@@ -177,7 +177,7 @@ namespace Versioning
 		{
 			var candidate = type.GetField(field.Name);
 
-			if (candidate != null && FieldInfoEqualityComparer.Singleton.Equals(field, candidate))
+			if (candidate != null && FieldResolutionEqualityComparer.Singleton.Equals(field, candidate))
 				return candidate;
 			return null;
 		}

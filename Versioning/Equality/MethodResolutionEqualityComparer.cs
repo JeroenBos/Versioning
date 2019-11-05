@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Versioning.Equality
 {
-
 	/// <summary>
 	/// Compares methods for equality in view of (binary) compatibility.
 	/// The context is, given two versions of an assembly and a MethodInfo from each, do they represent the same method? 

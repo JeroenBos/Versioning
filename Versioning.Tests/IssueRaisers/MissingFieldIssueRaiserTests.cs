@@ -85,11 +85,13 @@ namespace Versioning.Tests
 			// arrange
 			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
 			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
+			var raiser = new CompatiblityIssueCollector(this.raiser.IssueRaisers.Concat(new[] { new MissingTypeIssueRaiser() }).ToList());
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
-			Assert.AreEqual(0, issues.Count);
+			Assert.AreEqual(1, issues.Count);
+			Assert.IsAssignableFrom<MissingTypeIssue>(issues[0]);
 		}
 
 		[Test]

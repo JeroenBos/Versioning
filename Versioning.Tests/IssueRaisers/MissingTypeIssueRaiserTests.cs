@@ -32,7 +32,7 @@ namespace Versioning.Tests
 		public void NewTypeInNewAssemblyIsNotReported()
 		{
 			/// the difference with <see cref="MissingTypeIsReported"/> is the assembly contents are reversed
-			
+
 			// arrange
 			Assembly a = AssemblyGenerator.Load("").Assemblies.First();
 			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
@@ -55,6 +55,33 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
+		}
+
+		[Test]
+		public void MissingDelegateIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public delegate void D();").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+		}
+
+		[Test]
+		public void ChangingFromClassToValueTypeIsReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("public struct A { }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+
 		}
 	}
 }

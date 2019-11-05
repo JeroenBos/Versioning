@@ -21,11 +21,14 @@ namespace Versioning
 	public class CompatiblityIssueCollector
 	{
 		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
-		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers)
+		public bool RaiseWhenParentIsMissing { get; }
+		/// <param name="raiseWhenParentIsMissing"> Indicates whether issues should be raised on assembly elements evenwhen the declaring/parent assembly element is missing. </param>
+		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers, bool raiseWhenParentIsMissing = false)
 		{
 			if (issueRaisers == null) throw new ArgumentNullException(nameof(issueRaisers));
 
 			this.IssueRaisers = issueRaisers;
+			this.RaiseWhenParentIsMissing = raiseWhenParentIsMissing;
 		}
 
 		/// <summary>
@@ -46,9 +49,16 @@ namespace Versioning
 		/// </summary>
 		private IEnumerable<ICompatibilityIssue> GetIssuesOn(Type type, Type? otherType, IReadOnlyList<Type> candidates)
 		{
-			var issues = GetIssuesOn<Type>(type, otherType, candidates);
+			var issues = GetIssuesOn<Type>(type, otherType, candidates).ToList();
 			if (otherType == null)
 				return issues;
+
+			if (!this.RaiseWhenParentIsMissing)
+			{
+				bool isParentMissing = issues.OfType<Issues.MissingTypeIssue>().Any();
+				if (isParentMissing)
+					return issues;
+			}
 
 			var nestedIssues = type.GetFamilyAndPublicMembers().SelectMany(memberInfo => memberInfo switch
 			{
@@ -149,7 +159,7 @@ namespace Versioning
 		private IReadOnlyList<EventInfo> ResolveEventCandidates(EventInfo @event, Type type)
 		{
 			return type.GetEvent(@event.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-				       .ToSingletonListIfNotNull();
+					   .ToSingletonListIfNotNull();
 		}
 
 		/// <summary>
@@ -167,7 +177,7 @@ namespace Versioning
 		private IReadOnlyList<PropertyInfo> ResolvePropertyCandidates(PropertyInfo property, Type type)
 		{
 			return type.GetProperty(property.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-				       .ToSingletonListIfNotNull();
+					   .ToSingletonListIfNotNull();
 		}
 
 		/// <summary>
@@ -187,7 +197,7 @@ namespace Versioning
 		private IReadOnlyList<FieldInfo> ResolveFieldCandidates(FieldInfo field, Type type)
 		{
 			return type.GetField(field.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-				       .ToSingletonListIfNotNull();
+					   .ToSingletonListIfNotNull();
 		}
 
 		/// <summary>

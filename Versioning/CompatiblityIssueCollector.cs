@@ -36,7 +36,9 @@ namespace Versioning
 			if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 			if (assemblyHigherVersion == null) throw new ArgumentNullException(nameof(assemblyHigherVersion));
 
-			return assembly.GetTypes().SelectMany(type => GetIssuesOn(type, this.ResolveType(type, assemblyHigherVersion), Array.Empty<Type>()));
+			return assembly.GetTypes()
+						   .Where(type => type.DeclaringType == null) // nested types are handled as members
+						   .SelectMany(type => GetIssuesOn(type, this.ResolveType(type, assemblyHigherVersion), Array.Empty<Type>()));
 		}
 
 		/// <summary>
@@ -66,7 +68,13 @@ namespace Versioning
 		/// </summary>
 		private Type? ResolveType(Type type, Assembly assembly)
 		{
-			if (type.DeclaringType != null) throw new NotImplementedException();
+			if (type.DeclaringType != null)
+			{
+				Type? declaringTypeInOtherAssembly = ResolveType(type.DeclaringType, assembly);
+				if (declaringTypeInOtherAssembly == null)
+					return null;
+				return ResolveType(type, declaringTypeInOtherAssembly);
+			}
 
 			return assembly.GetTypes()
 						   .FirstOrDefault(t => TypeEqualityComparer.Singleton.Equals(type, t));

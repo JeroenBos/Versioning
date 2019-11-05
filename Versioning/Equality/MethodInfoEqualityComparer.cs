@@ -14,9 +14,19 @@ namespace Versioning.Equality
 			if (x == null) throw new ArgumentNullException(nameof(x));
 			if (y == null) throw new ArgumentNullException(nameof(y));
 
-			return x.GetParameters().SequenceEqual(y.GetParameters(), ParameterInfoEqualityComparer.Singleton)
-				&& x.ReturnType.FullName == y.ReturnType.FullName
-				&& x.GetGenericArguments().SequenceEqual(y.GetGenericArguments(), GenericParameterEqualityComparer.Singleton);
+			if (x.Name != y.Name)
+				return false;
+
+			if (x.GetAccessAndStaticModifiers() != y.GetAccessAndStaticModifiers())
+				return false;
+
+			if (!x.GetParameters().SequenceEqual(y.GetParameters(), ParameterInfoEqualityComparer.Singleton))
+				return false;
+			if (x.ReturnType.FullName != y.ReturnType.FullName)
+				return false;
+			if (!x.GetGenericArguments().SequenceEqual(y.GetGenericArguments(), GenericParameterEqualityComparer.Singleton))
+				return false;
+			return true;
 		}
 
 		public int GetHashCode(MethodInfo obj) => throw new NotImplementedException();

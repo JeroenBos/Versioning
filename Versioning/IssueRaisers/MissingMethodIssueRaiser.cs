@@ -10,7 +10,6 @@ namespace Versioning.IssueRaisers
 	{
 		public IEnumerable<ICompatibilityIssue> Evaluate(MethodInfo method, MethodInfo? equivalent, IReadOnlyList<MethodInfo> candidates)
 		{
-
 			if (equivalent != null)
 				yield break;
 
@@ -19,15 +18,13 @@ namespace Versioning.IssueRaisers
 			{
 				yield return new MissingMethodIssue(method);
 			}
-			else if (candidates.Count == 1)
-			{
-				// TODO: parameter checking
-				foreach (var issue in EvaluateAccessModifierChange(method, candidates[0]))
-					yield return issue;
-			}
 			else
 			{
-				throw new NotImplementedException();
+				yield return new MissingMethodIssue(method);
+				// we could further delve into why the candidate was rejected here and yield more specific issues
+				// but let's not do that for now
+				// foreach (var issue in EvaluateAccessModifierChange(method, candidates[0]))
+				//    yield return issue;
 			}
 		}
 

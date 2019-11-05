@@ -80,6 +80,19 @@ namespace Versioning.Tests
 		}
 
 		[Test]
+		public void MissingFieldOnMissingTypeIsNotReported()
+		{
+			// arrange
+			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
+			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
+		[Test]
 		public void ProtectedFieldMadePrivateIsReported()
 		{
 			// arrange

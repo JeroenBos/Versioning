@@ -9,6 +9,9 @@ using System.Runtime.Loader;
 
 namespace Versioning
 {
+	/// <summary>
+	/// This generates assemblies on the fly for testing.
+	/// </summary>
 	public static class AssemblyGenerator
 	{
 		private static readonly IReadOnlyCollection<MetadataReference> _references = new[] {

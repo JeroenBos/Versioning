@@ -1,7 +1,5 @@
 using NUnit.Framework;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -50,7 +48,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, assemblies[1].GetTypes()[0].GetFields().Length);
 		}
 
-
 		[Test]
 		public void CanLoadAssemblyWithDifferentReferencedVersion()
 		{
@@ -77,6 +74,17 @@ namespace Versioning.Tests
 			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferenceVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main).Assemblies.ToList();
 			var b = Activator.CreateInstance(assemblies[1].GetTypes()[0]);
 			Assert.AreEqual("B", b.GetType().Name);
+		}
+
+		[Test]
+		public void BindingFailsWhenMethodIsMadeAbstract()
+		{
+			const string sourceCode_DependencyV1 = @"public abstract class A { public void M() { } }";
+			const string sourceCode_DependencyV2 = @"public abstract class A { public abstract void M();}";
+			const string sourceCode_Main = @"public class B : A { }";
+			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferenceVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main).Assemblies.ToList();
+
+			Assert.Throws<ReflectionTypeLoadException>(() => Activator.CreateInstance(assemblies[1].GetTypes()[0]));
 		}
 
 	}

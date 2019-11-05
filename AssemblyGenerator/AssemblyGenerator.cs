@@ -14,15 +14,17 @@ namespace Versioning
 	/// </summary>
 	public static class AssemblyGenerator
 	{
-		private static readonly IReadOnlyCollection<MetadataReference> _references = new[] {
+		private static readonly IReadOnlyCollection<MetadataReference> defaultReferences = new[] {
 		  MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
 		};
 
 		public static Stream CreateAssembly(
 			string sourceCode,
 			string assemblyName,
+			out MetadataReference reference,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp8)
+			LanguageVersion languageVersion = LanguageVersion.CSharp8,
+			IReadOnlyCollection<MetadataReference>? references = null)
 
 		{
 			// parse
@@ -35,13 +37,16 @@ namespace Versioning
 				OutputKind.DynamicallyLinkedLibrary,
 				optimizationLevel: optimizationLevel,
 				allowUnsafe: true);
-			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions, references: _references)
-			  .AddReferences(_references)
+			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions, references: defaultReferences)
+			  .AddReferences(references ?? Array.Empty<MetadataReference>())
 			  .AddSyntaxTrees(syntaxTree);
+
+			reference = compilation.ToMetadataReference();
 
 			// emit
 			var stream = new MemoryStream();
 			var emitResult = compilation.Emit(stream);
+			var diagnostics = compilation.GetDeclarationDiagnostics();
 
 			if (emitResult.Success)
 			{
@@ -57,8 +62,25 @@ namespace Versioning
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
 			LanguageVersion languageVersion = LanguageVersion.CSharp8)
 		{
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, optimizationLevel, languageVersion);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion);
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
+			context.LoadFromStream(assemblyStream);
+			return context;
+		}
+
+
+		public static AssemblyLoadContext LoadAssemblyWithReference(
+			string referencedAssemblySourceCode,
+			string sourceCode,
+			string referencedAssemblyName = "defaultReferencedAssemblyName",
+			string assemblyName = "defaultAssemblyName")
+		{
+			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
+
+			var referencedStream = CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, references: new[] { reference });
+
+			context.LoadFromStream(referencedStream);
 			context.LoadFromStream(assemblyStream);
 			return context;
 		}

@@ -21,8 +21,16 @@ namespace Versioning.Equality
 				return true;
 			if (x == null ^ y == null)
 				return false;
+			if (x!.IsInterface != y!.IsInterface)
+				return false;
+			if (x.IsEnum != y.IsEnum)
+				return false;
+			if (x.IsClass != y.IsClass)
+				return false;
+			if (x.IsValueType != y.IsValueType)
+				return false;
 
-			return x!.Name == y!.Name
+			return x.Name == y.Name
 				&& x.Namespace == y.Namespace
 				&& x.GetGenericArguments().Length == y.GetGenericArguments().Length
 				&& x.IsPublic == y.IsPublic

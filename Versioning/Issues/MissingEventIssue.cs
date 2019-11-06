@@ -5,15 +5,17 @@ using System.Text;
 
 namespace Versioning.Issues
 {
-	public class MissingPropertyIssue : ICompatibilityIssue
+	public class MissingPropertyIssue : IMissingMemberCompatibilityIssue
 	{
-		public PropertyInfo Property { get; }
+		public PropertyInfo MissingProperty { get; }
 		public MissingPropertyIssue(PropertyInfo property)
 		{
 			if (property == null) throw new ArgumentNullException(nameof(property));
 
-			this.Property = property;
+			this.MissingProperty = property;
 		}
+
+		MemberInfo IMissingMemberCompatibilityIssue.MissingMember => MissingProperty;
 	}
 
 

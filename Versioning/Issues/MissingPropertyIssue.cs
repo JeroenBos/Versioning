@@ -5,14 +5,16 @@ using System.Linq;
 
 namespace Versioning.Issues
 {
-	public class MissingEventIssue : ICompatibilityIssue
+	public class MissingEventIssue : IMissingMemberCompatibilityIssue
 	{
-		public EventInfo Event { get; }
+		public EventInfo MissingEvent { get; }
 		public MissingEventIssue(EventInfo eventInfo)
 		{
 			if (eventInfo == null) throw new ArgumentNullException(nameof(eventInfo));
 
-			this.Event = eventInfo;
+			this.MissingEvent = eventInfo;
 		}
+
+		MemberInfo IMissingMemberCompatibilityIssue.MissingMember => MissingEvent;
 	}
 }

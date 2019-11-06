@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Versioning.Issues
 {
-	public class MissingMethodIssue : ICompatibilityIssue
+	public class MissingMethodIssue : IMissingMemberCompatibilityIssue
 	{
 		public MethodInfo MissingMethod { get; }
 		public MissingMethodIssue(MethodInfo missingMethod)
@@ -14,5 +14,7 @@ namespace Versioning.Issues
 
 			this.MissingMethod = missingMethod;
 		}
+
+		MemberInfo IMissingMemberCompatibilityIssue.MissingMember => MissingMethod;
 	}
 }

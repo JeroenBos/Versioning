@@ -32,6 +32,13 @@ namespace Versioning.UsageDetector
 				.OfType<TypeReference>();
 		}
 
+
+		public static IEnumerable<MemberReference> GetAllTypeAndMemberReferences(AssemblyDefinition assembly)
+		{
+			return AllReferenceTypeObjectsIn(assembly)
+				.OfType<MemberReference>();
+		}
+
 		static IEnumerable<object> AllReferenceTypeObjectsIn(object obj)
 		{
 			if (obj == null)
@@ -85,6 +92,51 @@ namespace Versioning.UsageDetector
 				}
 			}
 		}
+
+		/// <summary>
+		/// Ok, set out to solve the real problem:
+		/// Detect all type and member references to a particular assembly.
+		/// Detect all differences between two versions of that assembly.
+		/// Find the intersection.
+		/// </summary>
+		public static IEnumerable<DetectedCompatibilityIssue> Main(
+			CompatiblityIssueCollector collector,
+			AssemblyDefinition main,
+			AssemblyDefinition dependency,
+			AssemblyDefinition dependencyHigherVersion)
+		{
+			var usage = GetAllTypeAndMemberReferences(main).Where(reference => reference.RefersIn(dependency))
+                                                           .ToList();
+
+			throw new NotImplementedException();
+			// var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
+			// 					  .ToList();
+			// 
+			// 
+			// return from issue in issues
+			// 	   let locations = DetectIssue(issue, usage).ToList()
+			// 	   where locations.Count != 0
+			// 	   select new DetectedCompatibilityIssue(issue, locations);
+		}
+		public static bool RefersIn(this MemberReference reference, AssemblyDefinition dependency)
+		{
+			var type = (reference.Resolve() as TypeDefinition) ?? reference.Resolve().DeclaringType;
+
+			return dependency.Equals(type.Module.Assembly);
+		}
+		/// <summary>
+		/// Locates where the potential compatibility issue would actually be an issue.
+		/// </summary>
+		static IEnumerable<MemberReference> DetectIssue(ICompatibilityIssue potentialIssue, IReadOnlyList<MemberReference> references)
+		{
+			var locations = potentialIssue switch
+			{
+				IMissingMemberCompatibilityIssue missingMemberIssue => references.Where(missingMemberIssue.MissingMember.Equals),
+				_ => throw new NotImplementedException()
+			};
+			return locations;
+		}
+
 
 	}
 }

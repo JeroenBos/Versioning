@@ -21,6 +21,17 @@ namespace Versioning
 
 		public static Stream CreateAssembly(
 			string sourceCode,
+			string assemblyName = "defaultAssemblyName",
+			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
+			LanguageVersion languageVersion = LanguageVersion.Default,
+			IReadOnlyCollection<MetadataReference>? references = null)
+		{
+			return CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion, references);
+		}
+
+
+		public static Stream CreateAssembly(
+			string sourceCode,
 			string assemblyName,
 			out MetadataReference reference,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
@@ -63,7 +74,7 @@ namespace Versioning
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
 			LanguageVersion languageVersion = LanguageVersion.Default)
 		{
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, optimizationLevel, languageVersion);
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 			context.LoadFromStream(assemblyStream);
 			return context;
@@ -79,7 +90,7 @@ namespace Versioning
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 
 			var referencedStream = CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, references: new[] { reference });
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, references: new[] { reference });
 
 			context.LoadFromStream(referencedStream);
 			context.LoadFromStream(assemblyStream);
@@ -102,8 +113,8 @@ namespace Versioning
 			referencedAssemblySourceCodev2 = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]" + referencedAssemblySourceCodev2;
 
 			CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
-			var referencedAssemblyRuntime = CreateAssembly(referencedAssemblySourceCodev2, referencedAssemblyName, out var _);
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, references: new[] { reference });
+			var referencedAssemblyRuntime = CreateAssembly(referencedAssemblySourceCodev2, referencedAssemblyName);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, references: new[] { reference });
 
 			context.LoadFromStream(referencedAssemblyRuntime);
 			context.LoadFromStream(assemblyStream);

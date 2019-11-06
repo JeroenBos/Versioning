@@ -87,5 +87,17 @@ namespace Versioning.Tests
 			Assert.Throws<ReflectionTypeLoadException>(() => Activator.CreateInstance(assemblies[1].GetTypes()[0]));
 		}
 
+		[Test]
+		public void BindingFailsWhenParameterChanges()
+		{
+			const string sourceCode_DependencyV1 = @"public abstract class A { public void M(int i) { } }";
+			const string sourceCode_DependencyV2 = @"public abstract class A { public void M(uint i) { } }";
+			const string sourceCode_Main = @"public class B : A { public void F() { base.M(0); }}";
+			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferenceVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main).Assemblies.ToList();
+
+			dynamic b = Activator.CreateInstance(assemblies[1].GetTypes()[0]);
+			Assert.Throws<MissingMethodException>(() => b.F());
+		}
+
 	}
 }

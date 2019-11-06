@@ -11,7 +11,7 @@ namespace Versioning.Tests
 		public void CanCreateEmptyAssembly()
 		{
 			// Just checking that it doesn't throw
-			Stream assembly = AssemblyGenerator.CreateAssembly("", "assemblyname");
+			Stream assembly = AssemblyGenerator.CreateAssembly("", "assemblyname", out var _);
 			Assert.IsTrue(assembly.Length != 0);
 		}
 		[Test]

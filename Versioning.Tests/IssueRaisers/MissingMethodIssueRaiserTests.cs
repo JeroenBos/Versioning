@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Mono.Cecil;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -15,8 +16,8 @@ namespace Versioning.Tests
 		public void MissingMethodIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -31,8 +32,8 @@ namespace Versioning.Tests
 			/// the difference with <see cref="MissingEventIsReported"/> is the assembly contents are reversed
 
 			// arrange
-			Assembly a = AssemblyGenerator.Load("").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -44,8 +45,8 @@ namespace Versioning.Tests
 		public void MethodMadePrivateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -57,8 +58,8 @@ namespace Versioning.Tests
 		public void MethodMadeProtectedIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { protected void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -70,8 +71,8 @@ namespace Versioning.Tests
 		public void MethodOnMissingTypeIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("class A { public void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -83,8 +84,8 @@ namespace Versioning.Tests
 		public void MissingMethodOnMissingTypeIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { }"));
 			var raiser = new CompatiblityIssueCollector(this.raiser.IssueRaisers.Concat(new[] { new MissingTypeIssueRaiser() }).ToList());
 
 			// act
@@ -98,8 +99,8 @@ namespace Versioning.Tests
 		public void ProtectedMethodMadePrivateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { protected void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { private void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -111,8 +112,8 @@ namespace Versioning.Tests
 		public void InternalMethodMadePrivateIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { internal void m() { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { private void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -124,8 +125,8 @@ namespace Versioning.Tests
 		public void ParameterRemovalIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m(int i) { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public void m() { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(int i) { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -137,8 +138,8 @@ namespace Versioning.Tests
 		public void ParameterAdditionIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m(int i) { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public void m(int i, int j) { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(int i) { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(int i, int j) { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -151,8 +152,8 @@ namespace Versioning.Tests
 		public void RefParameterModifierRemovalIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m(ref int i) { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public void m(int i) { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(ref int i) { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(int i) { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -164,8 +165,8 @@ namespace Versioning.Tests
 		public void RefParameterModifierAdditionIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m(int i) { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public void m(ref int i) { } }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(int i) { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(ref int i) { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -178,8 +179,8 @@ namespace Versioning.Tests
 		public void ReturnTypeChangeIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public void m(int i) { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public int m(int i) => 0; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m(int i) { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int m(int i) => 0; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using Mono.Cecil;
 
 namespace Versioning.Equality
 {
@@ -20,27 +21,18 @@ namespace Versioning.Equality
 	/// - return type?
 	/// - return type ref/ref readonly modifiers?
 	/// </summary>
-	public class MethodResolutionEqualityComparer : IEqualityComparer<MethodInfo>
+	public class MethodResolutionEqualityComparer : IEqualityComparer<MethodDefinition>
 	{
 		public static readonly MethodResolutionEqualityComparer Singleton = new MethodResolutionEqualityComparer();
 
-		public bool Equals(MethodInfo x, MethodInfo y)
+		public bool Equals(MethodDefinition x, MethodDefinition y)
 		{
 			if (x == null) throw new ArgumentNullException(nameof(x));
 			if (y == null) throw new ArgumentNullException(nameof(y));
 
-			if (x.Name != y.Name)
-				return false;
-
-			if (!x.GetParameters().SequenceEqual(y.GetParameters(), ParameterInfoEqualityComparer.Singleton))
-				return false;
-			if (x.ReturnType.FullName != y.ReturnType.FullName)
-				return false;
-			if (!x.GetGenericArguments().SequenceEqual(y.GetGenericArguments(), GenericParameterEqualityComparer.Singleton))
-				return false;
-			return true;
+			return x.FullName == y.FullName;
 		}
 
-		public int GetHashCode(MethodInfo obj) => throw new NotImplementedException();
+		public int GetHashCode(MethodDefinition obj) => throw new NotImplementedException();
 	}
 }

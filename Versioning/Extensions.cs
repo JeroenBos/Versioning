@@ -1,71 +1,46 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
 namespace Versioning
 {
-	/// <summary>
-	/// Just some extension methods that I personally like using.
-	/// </summary>
 	public static class Extensions
 	{
-		/// <summary> Creates a sequence out of a single specified element. </summary>
-		[DebuggerHidden]
-		public static IEnumerable<T> ToSingleton<T>(this T element)
+
+		/// <summary> Concatenates all specified sequences. </summary>
+		public static IEnumerable<T> Concat<T>(params IEnumerable<T>[] sources)
 		{
-			yield return element;
+			return sources.Concat();
 		}
-
-		/// <summary> Creates a list out of a single specified element if it is not null; returns the empty sequence otherwise. </summary>
-		[DebuggerHidden]
-		public static IReadOnlyList<T> ToSingletonListIfNotNull<T>(this T element) where T : class
+		/// <summary> Concatenates all specified sequences. </summary>
+		public static IEnumerable<T> Concat<T>(this IEnumerable<IEnumerable<T>> sources)
 		{
-			if (element != null)
-				return new[] { element };
-			return Array.Empty<T>();
+			foreach (var sequence in sources)
+				foreach (T element in sequence)
+					yield return element;
 		}
-
-		/// <summary>
-		/// Gets the bindingflags for public/nonpublic and static/instance of the specified member info.
-		/// </summary>
-		public static BindingFlags GetAccessibilityBindingFlags(this MemberInfo member) => member.GetAccessAndStaticModifiers().ToBindingFlags();
-
-
 		/// <summary>
 		/// Returns a value representing the accessibility modifiers of the specified member.
 		/// </summary>
-		public static AccessAndStaticModifiers GetAccessibilityModifiers(this MemberInfo member) => member.GetAccessAndStaticModifiers() & AccessAndStaticModifiers.AccessMask;
+		public static AccessAndStaticModifiers GetAccessibilityModifiers(this IMemberDefinition member) => member.GetAccessAndStaticModifiers() & AccessAndStaticModifiers.AccessMask;
 
-		/// <summary>
-		/// Converts the specified accessibility level and static flag to public/nonpublic and static/instance binding flags.
-		/// </summary>
-		public static BindingFlags ToBindingFlags(this AccessAndStaticModifiers level)
-		{
-			if ((level & ~AccessAndStaticModifiers.Mask) != 0) throw new ArgumentException(nameof(level));
-
-			bool isStatic = (level & AccessAndStaticModifiers.Static) != 0;
-			bool isPublic = (level & AccessAndStaticModifiers.AccessMask) == AccessAndStaticModifiers.Public;
-
-			return (isStatic ? BindingFlags.Static : BindingFlags.Instance)
-				 | (isPublic ? BindingFlags.Public : BindingFlags.NonPublic);
-		}
 
 		/// <summary>
 		/// Returns a value representing the access modifiers and the presense of the static modifier of the specified member.
 		/// </summary>
-		public static AccessAndStaticModifiers GetAccessAndStaticModifiers(this MemberInfo member)
+		public static AccessAndStaticModifiers GetAccessAndStaticModifiers(this IMemberDefinition member)
 		{
 			if (member == null) throw new ArgumentNullException(nameof(member));
 
 			AccessAndStaticModifiers accessFlags = member switch
 			{
-				MethodBase method => (AccessAndStaticModifiers)method.Attributes,
-				PropertyInfo property => property.GetGetMethod(true)?.GetAccessAndStaticModifiers() ?? 0 | property.GetSetMethod(true)?.GetAccessAndStaticModifiers() ?? 0,
-				EventInfo @event => @event.GetAddMethod(true)?.GetAccessAndStaticModifiers() ?? 0 | @event.GetRemoveMethod(true)?.GetAccessAndStaticModifiers() ?? 0,
-				FieldInfo field => (AccessAndStaticModifiers)field.Attributes,
-				Type type => (type.Attributes & TypeAttributes.VisibilityMask) switch
+				MethodDefinition method => (AccessAndStaticModifiers)method.Attributes,
+				PropertyDefinition property => property.GetMethod?.GetAccessAndStaticModifiers() ?? 0 | property.SetMethod?.GetAccessAndStaticModifiers() ?? 0,
+				EventDefinition @event => @event.AddMethod?.GetAccessAndStaticModifiers() ?? 0 | @event.RemoveMethod?.GetAccessAndStaticModifiers() ?? 0,
+				FieldDefinition field => (AccessAndStaticModifiers)field.Attributes,
+				TypeDefinition type => (type.Attributes & TypeAttributes.VisibilityMask) switch
 				{
 					TypeAttributes.NotPublic => AccessAndStaticModifiers.Assembly,
 					TypeAttributes.Public => AccessAndStaticModifiers.Public,
@@ -82,72 +57,52 @@ namespace Versioning
 			return accessFlags & AccessAndStaticModifiers.Mask;
 		}
 
-		public static bool IsStatic(this Type type) => type.IsAbstract && type.IsSealed;
+		public static bool IsStatic(this TypeDefinition type) => type.IsAbstract && type.IsSealed;
 
 		/// <summary>
 		/// Gets all methods on the specified type with the same public, protected and static modifiers as the specified info.
 		/// </summary>
-		public static IEnumerable<MethodInfo> GetMethodsAccessibleLike(this Type type, MethodBase info)
+		public static IEnumerable<MethodDefinition> GetMethodsAccessibleLike(this TypeDefinition type, MethodDefinition method)
 		{
-			var all = type.GetMethods(info.GetAccessibilityBindingFlags());
-			if (info.IsFamily)
-				return all.Where(m => m.IsFamily);
-			else
-				return all;
-		}
-		/// <summary>
-		/// Gets all constructors on the specified type with the same public, protected and static modifiers as the specified info.
-		/// </summary>
-		public static IEnumerable<ConstructorInfo> GetConstructorsAccessibleLike(this Type type, MethodBase info)
-		{
-			var all = type.GetConstructors(info.GetAccessibilityBindingFlags());
-			if (info.IsFamily)
-				return all.Where(m => m.IsFamily);
-			else
-				return all;
+			return type.Methods.Where(m => m.GetAccessibilityModifiers() == method.GetAccessibilityModifiers());
 		}
 
 		/// <summary>
 		/// Gets all constructors on the specified type with the same public, protected and static modifiers as the specified info.
 		/// </summary>
-		public static IEnumerable<PropertyInfo> GetPropertiesAccessibleLike(this Type type, PropertyInfo info)
+		public static IEnumerable<PropertyDefinition> GetPropertiesAccessibleLike(this TypeDefinition type, PropertyDefinition property)
 		{
-			var all = type.GetProperties(info.GetAccessibilityBindingFlags());
-			if (info.IsFamily())
-				return all.Where(IsFamily);
-			else
-				return all;
+			return type.Properties.Where(p => p.GetAccessibilityModifiers() == property.GetAccessibilityModifiers());
 		}
 
 		/// <summary>
 		/// Gets whether the property has the access modifier 'protected'.
 		/// </summary>
-		public static bool IsFamily(this PropertyInfo propertyInfo)
+		public static bool IsFamily(this PropertyDefinition property)
 		{
-			if (propertyInfo == null) throw new ArgumentNullException(nameof(propertyInfo));
+			if (property == null) throw new ArgumentNullException(nameof(property));
 
-			return !propertyInfo.IsPublic()
-				&& propertyInfo.GetAccessors(true).Any(accessor => accessor.IsFamily);
+			return (property.GetMethod?.IsFamily ?? false) || (property.SetMethod?.IsFamily ?? false);
 		}
 
 		/// <summary>
 		/// Gets whether the property has the access modifier 'static'.
 		/// </summary>
-		public static bool IsStatic(this PropertyInfo propertyInfo)
+		public static bool IsStatic(this PropertyDefinition property)
 		{
-			if (propertyInfo == null) throw new ArgumentNullException(nameof(propertyInfo));
+			if (property == null) throw new ArgumentNullException(nameof(property));
 
-			return propertyInfo.GetAccessors(true).Any(accessor => accessor.IsStatic);
+			return (property.GetMethod?.IsStatic ?? false) || (property.SetMethod?.IsStatic ?? false);
 		}
 
 		/// <summary>
 		/// Gets whether the property has the access modifier 'public'.
 		/// </summary>
-		public static bool IsPublic(this PropertyInfo propertyInfo)
+		public static bool IsPublic(this PropertyDefinition property)
 		{
-			if (propertyInfo == null) throw new ArgumentNullException(nameof(propertyInfo));
+			if (property == null) throw new ArgumentNullException(nameof(property));
 
-			return propertyInfo.GetAccessors(true).Any(accessor => accessor.IsPublic);
+			return (property.GetMethod?.IsPublic ?? false) || (property.SetMethod?.IsPublic ?? false);
 		}
 
 		public static bool AccessModifierChangeIsAllowedTo(this AccessAndStaticModifiers from, AccessAndStaticModifiers to)
@@ -177,9 +132,9 @@ namespace Versioning
 		/// <summary>
 		/// Gets the members on the specified type that are visible outside of the assemby.
 		/// </summary>
-		public static IReadOnlyList<MemberInfo> GetFamilyAndPublicMembers(this Type type)
+		public static IReadOnlyList<IMemberDefinition> GetFamilyAndPublicMembers(this TypeDefinition type)
 		{
-			return type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+			return Concat<IMemberDefinition>(type.Methods, type.Fields, type.Properties, type.Events, type.NestedTypes)
 					   .Where(member => member.GetAccessibilityModifiers().IsFamilyOrPublic())
 					   .ToList();
 		}

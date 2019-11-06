@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,9 +7,9 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingFieldIssueRaiser : ICompatiblityIssueRaiser<FieldInfo>
+	public class MissingFieldIssueRaiser : ICompatiblityIssueRaiser<FieldDefinition>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(FieldInfo field, FieldInfo? resolved, IReadOnlyList<FieldInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(FieldDefinition field, FieldDefinition? resolved, IReadOnlyList<FieldDefinition> candidates)
 		{
 			if (resolved == null)
 			{

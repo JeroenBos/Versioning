@@ -20,7 +20,7 @@ namespace Versioning.Equality
 			if (x!.Count != y!.Count)
 				return false;
 
-			return Enumerable.SequenceEqual(x, y, ParameterInfoEqualityComparer.Singleton);
+			return Enumerable.SequenceEqual(x, y, ParameterEqualityComparer.Singleton);
 		}
 
 		public int GetHashCode(IReadOnlyList<ParameterInfo> obj) => throw new NotImplementedException();

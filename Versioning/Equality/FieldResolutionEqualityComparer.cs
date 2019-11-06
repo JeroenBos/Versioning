@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using Mono.Cecil;
 
 namespace Versioning.Equality
 {
@@ -16,23 +17,17 @@ namespace Versioning.Equality
 	/// I don't even know if the following would be breaking binary compatibility:
 	/// - static? abstract? extern? partial? 
 	/// </summary>
-	public class FieldResolutionEqualityComparer : IEqualityComparer<FieldInfo>
+	public class FieldResolutionEqualityComparer : IEqualityComparer<FieldDefinition>
 	{
 		public static readonly FieldResolutionEqualityComparer Singleton = new FieldResolutionEqualityComparer();
-		public bool Equals(FieldInfo x, FieldInfo y)
+		public bool Equals(FieldDefinition x, FieldDefinition y)
 		{
 			if (x == null) throw new ArgumentNullException(nameof(x));
 			if (y == null) throw new ArgumentNullException(nameof(y));
 
-			if (x.Name != y.Name)
-				return false;
-
-			if (!TypeResolutionEqualityComparer.Singleton.Equals(x.DeclaringType, y.DeclaringType))
-				return false;
-
-			return true;
+			return x.FullName == y.FullName;
 		}
 
-		public int GetHashCode(FieldInfo obj) => throw new NotImplementedException();
+		public int GetHashCode(FieldDefinition obj) => throw new NotImplementedException();
 	}
 }

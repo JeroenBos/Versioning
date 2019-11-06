@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingTypeIssueRaiser : ICompatiblityIssueRaiser<Type>
+	public class MissingTypeIssueRaiser : ICompatiblityIssueRaiser<TypeDefinition>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(Type type, Type? resolved, IReadOnlyList<Type> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(TypeDefinition type, TypeDefinition? resolved, IReadOnlyList<TypeDefinition> candidates)
 		{
 			if (resolved == null)
 			{

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Mono.Cecil;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -16,8 +17,8 @@ namespace Versioning.Tests
 		public void MissingFieldIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -31,8 +32,8 @@ namespace Versioning.Tests
 			/// the difference with <see cref="MissingFieldIsReported"/> is the assembly contents are reversed
 
 			// arrange
-			Assembly a = AssemblyGenerator.Load("").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -44,8 +45,8 @@ namespace Versioning.Tests
 		public void FieldMadePrivateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { int i; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -57,8 +58,8 @@ namespace Versioning.Tests
 		public void FieldMadeProtectedIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { protected int i; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -70,8 +71,8 @@ namespace Versioning.Tests
 		public void FieldOnMissingTypeIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("class A { public int i; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -83,8 +84,8 @@ namespace Versioning.Tests
 		public void MissingFieldOnMissingTypeIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { }"));
 			var raiser = new CompatiblityIssueCollector(this.raiser.IssueRaisers.Concat(new[] { new MissingTypeIssueRaiser() }).ToList());
 
 			// act
@@ -98,8 +99,8 @@ namespace Versioning.Tests
 		public void ProtectedFieldMadePrivateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { protected int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { private int i; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -112,8 +113,8 @@ namespace Versioning.Tests
 		public void InternalFieldMadePrivateIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { internal int i; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { private int i; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

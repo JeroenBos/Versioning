@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
 using Versioning.Equality;
+using Mono.Cecil;
+using Assembly = System.Reflection.Assembly;
+using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Versioning
 {
@@ -36,20 +39,37 @@ namespace Versioning
 		/// </summary>
 		public IEnumerable<ICompatibilityIssue> GetCompatibilityIssuesBetween(Assembly assembly, Assembly assemblyHigherVersion)
 		{
+			if (string.IsNullOrEmpty(assembly.Location))
+				throw new ArgumentException("Assembly must have location", nameof(assembly));
+			if (string.IsNullOrEmpty(assemblyHigherVersion.Location))
+				throw new ArgumentException("Assembly must have location", nameof(assemblyHigherVersion));
+
+			var definition = AssemblyDefinition.ReadAssembly(File.OpenRead(assembly.Location));
+			var definitionHigherVersion = AssemblyDefinition.ReadAssembly(File.OpenRead(assemblyHigherVersion.Location));
+			
+			return GetCompatibilityIssuesBetween(definition, definitionHigherVersion);
+		}
+
+		/// <summary>
+		/// Returns all compatibility issues between the specified assemblies, as raised by <see cref="IssueRaisers"/>.
+		/// </summary>
+		public IEnumerable<ICompatibilityIssue> GetCompatibilityIssuesBetween(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion)
+		{
 			if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 			if (assemblyHigherVersion == null) throw new ArgumentNullException(nameof(assemblyHigherVersion));
 
-			return assembly.GetTypes()
+			return assembly.MainModule
+						   .Types
 						   .Where(type => type.DeclaringType == null) // nested types are handled as members
-						   .SelectMany(type => GetIssuesOn(type, this.ResolveType(type, assemblyHigherVersion), Array.Empty<Type>()));
+						   .SelectMany(type => GetIssuesOn(type, this.ResolveType(type, assemblyHigherVersion), Array.Empty<TypeDefinition>()));
 		}
 
 		/// <summary>
 		/// Traverses the type system and collects all raised issues.
 		/// </summary>
-		private IEnumerable<ICompatibilityIssue> GetIssuesOn(Type type, Type? otherType, IReadOnlyList<Type> candidates)
+		private IEnumerable<ICompatibilityIssue> GetIssuesOn(TypeDefinition type, TypeDefinition? otherType, IReadOnlyList<TypeDefinition> candidates)
 		{
-			var issues = GetIssuesOn<Type>(type, otherType, candidates).ToList();
+			var issues = GetIssuesOn<TypeDefinition>(type, otherType, candidates).ToList();
 			if (otherType == null)
 				return issues;
 
@@ -60,14 +80,13 @@ namespace Versioning
 					return issues;
 			}
 
-			var nestedIssues = type.GetFamilyAndPublicMembers().SelectMany(memberInfo => memberInfo switch
+			var nestedIssues = type.GetFamilyAndPublicMembers().SelectMany(member => member switch
 			{
-				FieldInfo fi => GetIssuesOn(fi, this.ResolveField(fi, otherType), this.ResolveFieldCandidates(fi, otherType)),
-				PropertyInfo pi => GetIssuesOn(pi, this.ResolveProperty(pi, otherType), this.ResolvePropertyCandidates(pi, otherType)),
-				ConstructorInfo ci => GetIssuesOn(ci, this.ResolveConstructor(ci, otherType), this.ResolveConstructorCandidates(ci, otherType)),
-				MethodInfo mi => GetIssuesOn(mi, this.ResolveMethod(mi, otherType), this.ResolveMethodCandidates(mi, otherType)),
-				EventInfo ei => GetIssuesOn(ei, this.ResolveEvent(ei, otherType), this.ResolveEventCandidates(ei, otherType)),
-				Type nt => GetIssuesOn(nt, this.ResolveType(nt, otherType), this.ResolveTypeCandidates(nt, otherType)),
+				FieldDefinition f => GetIssuesOn(f, this.ResolveField(f, otherType), this.ResolveFieldCandidates(f, otherType)),
+				PropertyDefinition p => GetIssuesOn(p, this.ResolveProperty(p, otherType), this.ResolvePropertyCandidates(p, otherType)),
+				MethodDefinition m => GetIssuesOn(m, this.ResolveMethod(m, otherType), this.ResolveMethodCandidates(m, otherType)),
+				EventDefinition e => GetIssuesOn(e, this.ResolveEvent(e, otherType), this.ResolveEventCandidates(e, otherType)),
+				TypeDefinition nt => GetIssuesOn(nt, this.ResolveType(nt, otherType), this.ResolveTypeCandidates(nt, otherType)),
 				_ => throw new Exception()
 			});
 			return issues.Concat(nestedIssues);
@@ -76,39 +95,40 @@ namespace Versioning
 		/// <summary>
 		/// Tries to find the same type in the specified assembly.
 		/// </summary>
-		private Type? ResolveType(Type type, Assembly assembly)
+		private TypeDefinition? ResolveType(TypeDefinition type, AssemblyDefinition assembly)
 		{
 			if (type.DeclaringType != null)
 			{
-				Type? declaringTypeInOtherAssembly = ResolveType(type.DeclaringType, assembly);
+				TypeDefinition? declaringTypeInOtherAssembly = ResolveType(type.DeclaringType, assembly);
 				if (declaringTypeInOtherAssembly == null)
 					return null;
 				return ResolveType(type, declaringTypeInOtherAssembly);
 			}
 
-			return assembly.GetTypes()
+			return assembly.MainModule
+						   .Types
 						   .FirstOrDefault(t => TypeResolutionEqualityComparer.Singleton.Equals(type, t));
 		}
 		/// <summary>
 		/// Tries to find the same (by name and arity) nested type in the specified type.
 		/// </summary>
-		private Type? ResolveType(Type type, Type containerType)
+		private TypeDefinition? ResolveType(TypeDefinition type, TypeDefinition containerType)
 		{
-			return containerType.GetNestedTypes(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+			return containerType.NestedTypes
 								.FirstOrDefault(t => TypeResolutionEqualityComparer.Singleton.Equals(type, t));
 		}
 		/// <summary>
 		/// For simplicity for now there are no type candidates. They must simply match exactly.
 		/// </summary>
-		private IReadOnlyList<Type> ResolveTypeCandidates(Type type, Type containerType)
+		private IReadOnlyList<TypeDefinition> ResolveTypeCandidates(TypeDefinition type, TypeDefinition containerType)
 		{
-			return Array.Empty<Type>();
+			return Array.Empty<TypeDefinition>();
 		}
 
 		/// <summary>
 		/// Tries to find the exact same method in the specified type.
 		/// </summary>
-		private MethodInfo? ResolveMethod(MethodInfo method, Type type)
+		private MethodDefinition? ResolveMethod(MethodDefinition method, TypeDefinition type)
 		{
 			return type.GetMethodsAccessibleLike(method)
 					   .FirstOrDefault(m => MethodResolutionEqualityComparer.Singleton.Equals(m, method));
@@ -117,7 +137,7 @@ namespace Versioning
 		/// <summary>
 		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.
 		/// </summary>
-		private IReadOnlyList<MethodInfo> ResolveMethodCandidates(MethodInfo method, Type type)
+		private IReadOnlyList<MethodDefinition> ResolveMethodCandidates(MethodDefinition method, TypeDefinition type)
 		{
 			return type.GetMethodsAccessibleLike(method)
 					   .Where(mi => mi.Name == method.Name)
@@ -125,67 +145,47 @@ namespace Versioning
 		}
 
 		/// <summary>
-		/// Tries to find the exact same method in the specified type.
-		/// </summary>
-		private ConstructorInfo? ResolveConstructor(ConstructorInfo constructor, Type type)
-		{
-			return type.GetConstructorsAccessibleLike(constructor)
-					   .FirstOrDefault(ctor => ConstructorInfoEqualityComparer.Singleton.Equals(ctor, constructor));
-		}
-		/// <summary>
-		/// Returns all methods in the specified type with the same name and public, protected and static modifiers.
-		/// </summary>
-		private IReadOnlyList<ConstructorInfo> ResolveConstructorCandidates(ConstructorInfo ctor, Type type)
-		{
-			return type.GetConstructorsAccessibleLike(ctor)
-					   .Where(mi => mi.Name == ctor.Name)
-					   .ToList();
-		}
-
-		/// <summary>
 		/// Tries to find the exact same event in the specified type.
 		/// </summary>
-		private EventInfo? ResolveEvent(EventInfo @event, Type type)
+		private EventDefinition? ResolveEvent(EventDefinition @event, TypeDefinition type)
 		{
-			var candidate = type.GetEvent(@event.Name);
+			var candidate = type.Events.FirstOrDefault(e => e.Name == @event.Name);
 
-			if (candidate != null && EventInfoEqualityComparer.Singleton.Equals(@event, candidate))
+			if (candidate != null && EventResolutionEqualityComparer.Singleton.Equals(@event, candidate))
 				return candidate;
 			return null;
 		}
 		/// <summary>
 		/// Returns all events in the specified type with the same name.
 		/// </summary>
-		private IReadOnlyList<EventInfo> ResolveEventCandidates(EventInfo @event, Type type)
+		private IReadOnlyList<EventDefinition> ResolveEventCandidates(EventDefinition @event, TypeDefinition type)
 		{
-			return type.GetEvent(@event.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-					   .ToSingletonListIfNotNull();
+			return new ReadOnlyCollection<EventDefinition>(type.Events);
 		}
 
 		/// <summary>
 		/// Tries to find the exact same property in the specified type.
 		/// </summary>
-		private PropertyInfo? ResolveProperty(PropertyInfo property, Type type)
+		private PropertyDefinition? ResolveProperty(PropertyDefinition property, TypeDefinition type)
 		{
 			return type.GetPropertiesAccessibleLike(property)
-					   .Where(p => PropertyInfoEqualityComparer.Singleton.Equals(p, property))
+					   .Where(p => PropertyResolutionEqualityComparer.Singleton.Equals(p, property))
 					   .FirstOrDefault();
 		}
 		/// <summary>
 		/// Returns all properties in the specified type with the same name.
 		/// </summary>
-		private IReadOnlyList<PropertyInfo> ResolvePropertyCandidates(PropertyInfo property, Type type)
+		private IReadOnlyList<PropertyDefinition> ResolvePropertyCandidates(PropertyDefinition property, TypeDefinition type)
 		{
-			return type.GetProperty(property.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-					   .ToSingletonListIfNotNull();
+			return new ReadOnlyCollection<PropertyDefinition>(type.Properties);
 		}
 
 		/// <summary>
 		/// Tries to find the same exact field in the specified type.
 		/// </summary>
-		private FieldInfo? ResolveField(FieldInfo field, Type type)
+		private FieldDefinition? ResolveField(FieldDefinition field, TypeDefinition type)
 		{
-			var candidate = type.GetField(field.Name);
+			var candidate = type.Fields.FirstOrDefault(f => f.Name == field.Name);
 
 			if (candidate != null && FieldResolutionEqualityComparer.Singleton.Equals(field, candidate))
 				return candidate;
@@ -194,10 +194,9 @@ namespace Versioning
 		/// <summary>
 		/// Returns all fields in the specified type with the same name.
 		/// </summary>
-		private IReadOnlyList<FieldInfo> ResolveFieldCandidates(FieldInfo field, Type type)
+		private IReadOnlyList<FieldDefinition> ResolveFieldCandidates(FieldDefinition field, TypeDefinition type)
 		{
-			return type.GetField(field.Name, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-					   .ToSingletonListIfNotNull();
+			return new ReadOnlyCollection<FieldDefinition>(type.Fields);
 		}
 
 		/// <summary>

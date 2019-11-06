@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Linq;
 using Versioning.IssueRaisers;
 using Versioning.Issues;
+using Mono.Cecil;
 
 namespace Versioning.Tests
 {
@@ -15,8 +16,8 @@ namespace Versioning.Tests
 		public void MissingEventIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public event System.Action a; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -28,11 +29,9 @@ namespace Versioning.Tests
 		[Test]
 		public void NewEventInNewAssemblyIsNotReported()
 		{
-			/// the difference with <see cref="MissingEventIsReported"/> is the assembly contents are reversed
-
 			// arrange
-			Assembly a = AssemblyGenerator.Load("").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { public event System.Action a; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -44,8 +43,8 @@ namespace Versioning.Tests
 		public void EventMadePrivateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public event System.Action a; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { event System.Action a; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -57,8 +56,8 @@ namespace Versioning.Tests
 		public void EventMadeProtectedIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public event System.Action a; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { protected event System.Action a; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -70,8 +69,8 @@ namespace Versioning.Tests
 		public void EventOnMissingTypeIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public event System.Action a; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("class A { public event System.Action a; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -83,8 +82,8 @@ namespace Versioning.Tests
 		public void ProtectedEventMadePrivateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { protected event System.Action a; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { private event System.Action a; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -97,8 +96,8 @@ namespace Versioning.Tests
 		public void InternalEventMadePrivateIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { internal event System.Action a; }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { private event System.Action a; }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

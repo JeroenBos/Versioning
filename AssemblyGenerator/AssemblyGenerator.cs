@@ -18,12 +18,13 @@ namespace Versioning
 		  MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
 		};
 
+
 		public static Stream CreateAssembly(
 			string sourceCode,
 			string assemblyName,
 			out MetadataReference reference,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp8,
+			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 
 		{
@@ -60,7 +61,7 @@ namespace Versioning
 			string sourceCode,
 			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp8)
+			LanguageVersion languageVersion = LanguageVersion.Default)
 		{
 			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion);
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();

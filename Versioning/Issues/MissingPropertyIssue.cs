@@ -6,7 +6,7 @@ using Mono.Cecil;
 
 namespace Versioning.Issues
 {
-	public class MissingEventIssue : ICompatibilityIssue
+	public class MissingEventIssue : IMissingMemberCompatibilityIssue
 	{
 		public EventDefinition MissingEvent { get; }
 		public MissingEventIssue(EventDefinition @event)
@@ -15,5 +15,7 @@ namespace Versioning.Issues
 
 			this.MissingEvent = @event;
 		}
+
+		IMemberDefinition IMissingMemberCompatibilityIssue.MissingMember => MissingEvent;
 	}
 }

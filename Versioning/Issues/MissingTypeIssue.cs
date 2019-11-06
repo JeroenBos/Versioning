@@ -1,11 +1,12 @@
 ﻿using Mono.Cecil;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Versioning.Issues
 {
-	public class MissingTypeIssue : ICompatibilityIssue
+	public class MissingTypeIssue : IMissingMemberCompatibilityIssue
 	{
 		public TypeDefinition MissingType { get; }
 		public MissingTypeIssue(TypeDefinition missingType)
@@ -14,5 +15,7 @@ namespace Versioning.Issues
 
 			this.MissingType = missingType;
 		}
+
+		IMemberDefinition IMissingMemberCompatibilityIssue.MissingMember => MissingType;
 	}
 }

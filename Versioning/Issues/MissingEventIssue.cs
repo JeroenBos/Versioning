@@ -1,20 +1,21 @@
 ﻿using Mono.Cecil;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 
 namespace Versioning.Issues
 {
-	public class MissingPropertyIssue : ICompatibilityIssue
+	public class MissingPropertyIssue : IMissingMemberCompatibilityIssue
 	{
-		public PropertyDefinition Property { get; }
+		public PropertyDefinition MissingProperty { get; }
 		public MissingPropertyIssue(PropertyDefinition property)
 		{
 			if (property == null) throw new ArgumentNullException(nameof(property));
 
-			this.Property = property;
+			this.MissingProperty = property;
 		}
+
+		IMemberDefinition IMissingMemberCompatibilityIssue.MissingMember => MissingProperty;
 	}
 
 

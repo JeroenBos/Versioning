@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Versioning.Issues
 {
-	public class MissingFieldIssue : ICompatibilityIssue
+	public class MissingFieldIssue : IMissingMemberCompatibilityIssue
 	{
 		public FieldDefinition MissingField { get; }
 		public MissingFieldIssue(FieldDefinition missingField)
@@ -15,5 +15,7 @@ namespace Versioning.Issues
 
 			this.MissingField = missingField;
 		}
+
+		IMemberDefinition IMissingMemberCompatibilityIssue.MissingMember => MissingField;
 	}
 }

@@ -32,7 +32,7 @@ namespace Versioning.Equality
 			return x!.IsEnum == y!.IsEnum 
 				&& x.IsInterface == y.IsInterface
 				&& x.IsClass == y.IsClass
-				&& y.IsValueType == y.IsValueType
+				&& x.IsValueType == y.IsValueType
 				&& x.FullName == y.FullName;
 		}
 

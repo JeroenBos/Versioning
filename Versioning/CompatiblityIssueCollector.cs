@@ -82,10 +82,10 @@ namespace Versioning
 
 			var nestedIssues = type.GetFamilyAndPublicMembers().SelectMany(member => member switch
 			{
-				Mono.Cecil.FieldDefinition f => GetIssuesOn(f, this.ResolveField(f, otherType), this.ResolveFieldCandidates(f, otherType)),
-				Mono.Cecil.PropertyDefinition p => GetIssuesOn(p, this.ResolveProperty(p, otherType), this.ResolvePropertyCandidates(p, otherType)),
-				Mono.Cecil.MethodDefinition m => GetIssuesOn(m, this.ResolveMethod(m, otherType), this.ResolveMethodCandidates(m, otherType)),
-				Mono.Cecil.EventDefinition e => GetIssuesOn(e, this.ResolveEvent(e, otherType), this.ResolveEventCandidates(e, otherType)),
+				FieldDefinition f => GetIssuesOn(f, this.ResolveField(f, otherType), this.ResolveFieldCandidates(f, otherType)),
+				PropertyDefinition p => GetIssuesOn(p, this.ResolveProperty(p, otherType), this.ResolvePropertyCandidates(p, otherType)),
+				MethodDefinition m => GetIssuesOn(m, this.ResolveMethod(m, otherType), this.ResolveMethodCandidates(m, otherType)),
+				EventDefinition e => GetIssuesOn(e, this.ResolveEvent(e, otherType), this.ResolveEventCandidates(e, otherType)),
 				TypeDefinition nt => GetIssuesOn(nt, this.ResolveType(nt, otherType), this.ResolveTypeCandidates(nt, otherType)),
 				_ => throw new Exception()
 			});
@@ -151,7 +151,7 @@ namespace Versioning
 		{
 			var candidate = type.Events.FirstOrDefault(e => e.Name == @event.Name);
 
-			if (candidate != null && EventInfoEqualityComparer.Singleton.Equals(@event, candidate))
+			if (candidate != null && EventResolutionEqualityComparer.Singleton.Equals(@event, candidate))
 				return candidate;
 			return null;
 		}
@@ -169,7 +169,7 @@ namespace Versioning
 		private PropertyDefinition? ResolveProperty(PropertyDefinition property, TypeDefinition type)
 		{
 			return type.GetPropertiesAccessibleLike(property)
-					   .Where(p => PropertyInfoEqualityComparer.Singleton.Equals(p, property))
+					   .Where(p => PropertyResolutionEqualityComparer.Singleton.Equals(p, property))
 					   .FirstOrDefault();
 		}
 		/// <summary>

@@ -8,35 +8,18 @@ namespace Versioning
 {
 	public static class Extensions
 	{
-		/// <summary> Creates a sequence out of a single specified element. </summary>
-		[DebuggerHidden]
-		public static IEnumerable<T> ToSingleton<T>(this T element)
-		{
-			yield return element;
-		}
 
-		/// <summary> Creates a list out of a single specified element if it is not null; returns the empty sequence otherwise. </summary>
-		[DebuggerHidden]
-		public static IReadOnlyList<T> ToSingletonListIfNotNull<T>(this T element) where T : class
+		/// <summary> Concatenates all specified sequences. </summary>
+		public static IEnumerable<T> Concat<T>(params IEnumerable<T>[] sources)
 		{
-			if (element != null)
-				return new[] { element };
-			return Array.Empty<T>();
+			return sources.Concat();
 		}
-
+		/// <summary> Concatenates all specified sequences. </summary>
 		public static IEnumerable<T> Concat<T>(this IEnumerable<IEnumerable<T>> sources)
 		{
 			foreach (var sequence in sources)
 				foreach (T element in sequence)
 					yield return element;
-		}
-		/// <summary> Concatenates all specified sequences. </summary>
-		/// <typeparam name="T"> The type of the sequence elements. </typeparam>
-		/// <param name="source"> The first sequence to concatenate. </param>
-		/// <param name="sources"> The sequences to concatenate ot <paramref name="source"/>. Cannot be or contain null. </param>
-		public static IEnumerable<T> Concat<T>(params IEnumerable<T>[] sources)
-		{
-			return sources.Concat();
 		}
 		/// <summary>
 		/// Returns a value representing the accessibility modifiers of the specified member.
@@ -79,17 +62,17 @@ namespace Versioning
 		/// <summary>
 		/// Gets all methods on the specified type with the same public, protected and static modifiers as the specified info.
 		/// </summary>
-		public static IEnumerable<MethodDefinition> GetMethodsAccessibleLike(this TypeDefinition type, MethodDefinition info)
+		public static IEnumerable<MethodDefinition> GetMethodsAccessibleLike(this TypeDefinition type, MethodDefinition method)
 		{
-			return type.Methods.Where(m => m.GetAccessibilityModifiers() == info.GetAccessibilityModifiers());
+			return type.Methods.Where(m => m.GetAccessibilityModifiers() == method.GetAccessibilityModifiers());
 		}
 
 		/// <summary>
 		/// Gets all constructors on the specified type with the same public, protected and static modifiers as the specified info.
 		/// </summary>
-		public static IEnumerable<PropertyDefinition> GetPropertiesAccessibleLike(this TypeDefinition type, PropertyDefinition info)
+		public static IEnumerable<PropertyDefinition> GetPropertiesAccessibleLike(this TypeDefinition type, PropertyDefinition property)
 		{
-			return type.Properties.Where(p => p.GetAccessibilityModifiers() == info.GetAccessibilityModifiers());
+			return type.Properties.Where(p => p.GetAccessibilityModifiers() == property.GetAccessibilityModifiers());
 		}
 
 		/// <summary>

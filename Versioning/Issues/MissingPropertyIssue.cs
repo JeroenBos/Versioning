@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using Mono.Cecil;
 
 namespace Versioning.Issues
 {
 	public class MissingEventIssue : ICompatibilityIssue
 	{
-		public EventInfo Event { get; }
-		public MissingEventIssue(EventInfo eventInfo)
+		public EventDefinition MissingEvent { get; }
+		public MissingEventIssue(EventDefinition @event)
 		{
-			if (eventInfo == null) throw new ArgumentNullException(nameof(eventInfo));
+			if (@event == null) throw new ArgumentNullException(nameof(@event));
 
-			this.Event = eventInfo;
+			this.MissingEvent = @event;
 		}
 	}
 }

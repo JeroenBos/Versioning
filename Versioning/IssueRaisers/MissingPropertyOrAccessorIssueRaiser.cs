@@ -11,57 +11,34 @@ namespace Versioning.IssueRaisers
 	{
 		public IEnumerable<ICompatibilityIssue> Evaluate(PropertyDefinition property, PropertyDefinition? resolved, IReadOnlyList<PropertyDefinition> candidates)
 		{
-			if (resolved != null)
-				yield break;
-
-			if (candidates.Count == 0
-			 || candidates.Count == 1 && candidates[0].IsStatic() != property.IsStatic())
+			if (resolved == null)
 			{
 				yield return new MissingPropertyIssue(property);
 			}
-			else if (candidates.Count == 1)
+			else
 			{
-				var candidate = candidates[0];
-
-				var propertyAccessibility = property.GetAccessAndStaticModifiers();
-				var candidateAccessibility = candidate.GetAccessAndStaticModifiers();
-				if (!AccessModifierChangeIsAllowed(propertyAccessibility, candidateAccessibility))
+				var accessibility = property.GetAccessAndStaticModifiers();
+				var resolvedAccessibility = resolved.GetAccessAndStaticModifiers();
+				if (!accessibility.AccessModifierChangeIsAllowedTo(resolvedAccessibility))
 				{
 					yield return new MissingPropertyIssue(property);
 				}
 				else
 				{
-					var propertyGetter = property.GetMethod;
-					var propertySetter = property.SetMethod;
-					var candidateGetter = candidate.GetMethod;
-					var candidateSetter = candidate.SetMethod;
-
-					if (propertyGetter != null)
+					if (property.GetMethod != null)
 					{
-						if (candidateGetter == null)
+						var getterIssues = MissingMethodIssueRaiser.Evaluate(property.GetMethod, resolved?.GetMethod, candidates.Select(c => c.GetMethod).Where(a => a != null).ToList());
+						foreach (var issue in getterIssues)
 							yield return new MissingAccessorIssue(property, PropertyAccessor.Get);
-						else foreach (var issue in MissingMethodIssueRaiser.EvaluateAccessModifierChange(propertyGetter, candidateGetter))
-								yield return new MissingAccessorIssue(property, PropertyAccessor.Get);
 					}
-
-					if (propertySetter != null)
+					if (property.SetMethod != null)
 					{
-						if (candidateSetter == null)
+						var setterIssues = MissingMethodIssueRaiser.Evaluate(property.SetMethod, resolved?.SetMethod, candidates.Select(c => c.SetMethod).Where(a => a != null).ToList());
+						foreach (var issue in setterIssues)
 							yield return new MissingAccessorIssue(property, PropertyAccessor.Set);
-						else foreach (var issue in MissingMethodIssueRaiser.EvaluateAccessModifierChange(propertySetter, candidateSetter))
-								yield return new MissingAccessorIssue(property, PropertyAccessor.Set);
 					}
-
 				}
 			}
-			else
-			{
-				// maybe hidden by sig properties show up here? TODO
-				// indexer overloads TODO
-				throw new NotImplementedException();
-			}
 		}
-
-		private static bool AccessModifierChangeIsAllowed(AccessAndStaticModifiers from, AccessAndStaticModifiers to) => from.AccessModifierChangeIsAllowedTo(to);
 	}
 }

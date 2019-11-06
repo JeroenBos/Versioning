@@ -6,9 +6,9 @@ using Mono.Cecil;
 
 namespace Versioning.Equality
 {
-	public class PropertyInfoEqualityComparer : IEqualityComparer<PropertyDefinition>
+	public class PropertyResolutionEqualityComparer : IEqualityComparer<PropertyDefinition>
 	{
-		public static readonly PropertyInfoEqualityComparer Singleton = new PropertyInfoEqualityComparer();
+		public static readonly PropertyResolutionEqualityComparer Singleton = new PropertyResolutionEqualityComparer();
 
 		public bool Equals(PropertyDefinition x, PropertyDefinition y)
 		{

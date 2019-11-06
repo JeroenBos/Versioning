@@ -6,9 +6,9 @@ using Mono.Cecil;
 
 namespace Versioning.Equality
 {
-	public class EventInfoEqualityComparer : IEqualityComparer<EventDefinition>
+	public class EventResolutionEqualityComparer : IEqualityComparer<EventDefinition>
 	{
-		public static readonly EventInfoEqualityComparer Singleton = new EventInfoEqualityComparer();
+		public static readonly EventResolutionEqualityComparer Singleton = new EventResolutionEqualityComparer();
 		public bool Equals(EventDefinition x, EventDefinition y)
 		{
 			if (x == null) throw new ArgumentNullException(nameof(x));

@@ -29,7 +29,11 @@ namespace Versioning.Equality
 			if (x == null ^ y == null)
 				return false;
 
-			return x!.FullName == y!.FullName;
+			return x!.IsEnum == y!.IsEnum 
+				&& x.IsInterface == y.IsInterface
+				&& x.IsClass == y.IsClass
+				&& y.IsValueType == y.IsValueType
+				&& x.FullName == y.FullName;
 		}
 
 		public int GetHashCode(TypeDefinition obj) => throw new NotImplementedException();

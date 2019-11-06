@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace Versioning.Equality
 {
-	public class ParameterInfoEqualityComparer : IEqualityComparer<ParameterInfo>
+	public class ParameterEqualityComparer : IEqualityComparer<ParameterInfo>
 	{
-		public static readonly ParameterInfoEqualityComparer Singleton = new ParameterInfoEqualityComparer();
+		public static readonly ParameterEqualityComparer Singleton = new ParameterEqualityComparer();
 
 		public bool Equals(ParameterInfo x, ParameterInfo y)
 		{

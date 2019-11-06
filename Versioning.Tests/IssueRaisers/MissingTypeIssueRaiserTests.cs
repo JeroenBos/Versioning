@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Linq;
 using Versioning.IssueRaisers;
 using Versioning.Issues;
+using Mono.Cecil;
 
 namespace Versioning.Tests
 {
@@ -16,8 +17,8 @@ namespace Versioning.Tests
 		public void MissingTypeIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -33,8 +34,8 @@ namespace Versioning.Tests
 			/// the difference with <see cref="MissingTypeIsReported"/> is the assembly contents are reversed
 
 			// arrange
-			Assembly a = AssemblyGenerator.Load("").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -46,8 +47,8 @@ namespace Versioning.Tests
 		public void TypeMadeInternalIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -59,8 +60,8 @@ namespace Versioning.Tests
 		public void MissingDelegateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public delegate void D();").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public delegate void D();"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -72,8 +73,8 @@ namespace Versioning.Tests
 		public void ChangingFromClassToValueTypeIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public struct A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public struct A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -86,8 +87,8 @@ namespace Versioning.Tests
 		public void MissingNestedDelegateIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public delegate void D(); }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { }").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public delegate void D(); }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -100,8 +101,8 @@ namespace Versioning.Tests
 		public void NestedStructMadeInternalIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public struct S { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { internal struct S { }}").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public struct S { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal struct S { }}"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -114,8 +115,8 @@ namespace Versioning.Tests
 		public void NestedStructMadeProtectedIsReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { public struct S { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { protected struct S { }}").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public struct S { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected struct S { }}"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -128,8 +129,8 @@ namespace Versioning.Tests
 		public void NestedProtectedStructMadeProtectedInternalIsNotReported()
 		{
 			// arrange
-			Assembly a = AssemblyGenerator.Load("public class A { protected struct S { } }").Assemblies.First();
-			Assembly b = AssemblyGenerator.Load("public class A { protected internal struct S { }}").Assemblies.First();
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected struct S { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected internal struct S { }}"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

@@ -14,6 +14,15 @@ namespace Versioning
 	/// </summary>
 	public static class AssemblyGenerator
 	{
+		public static Stream CreateStream(string sourceCode,
+			string assemblyName = "defaultAssemblyName",
+			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
+			LanguageVersion languageVersion = LanguageVersion.CSharp8,
+			IReadOnlyCollection<MetadataReference>? references = null)
+		{
+			return CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion, references);
+		}
+
 		private static readonly IReadOnlyCollection<MetadataReference> defaultReferences = new[] {
 		  MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
 		};
@@ -97,7 +106,7 @@ namespace Versioning
 			string assemblyName = "defaultAssemblyName")
 		{
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
-			
+
 			referencedAssemblySourceCodev2 = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]" + referencedAssemblySourceCodev2;
 
 			CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);

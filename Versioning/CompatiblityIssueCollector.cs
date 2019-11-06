@@ -5,6 +5,7 @@ using Versioning.Equality;
 using Mono.Cecil;
 using Assembly = System.Reflection.Assembly;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Versioning
 {
@@ -38,7 +39,15 @@ namespace Versioning
 		/// </summary>
 		public IEnumerable<ICompatibilityIssue> GetCompatibilityIssuesBetween(Assembly assembly, Assembly assemblyHigherVersion)
 		{
-			throw new NotImplementedException();
+			if (string.IsNullOrEmpty(assembly.Location))
+				throw new ArgumentException("Assembly must have location", nameof(assembly));
+			if (string.IsNullOrEmpty(assemblyHigherVersion.Location))
+				throw new ArgumentException("Assembly must have location", nameof(assemblyHigherVersion));
+
+			var definition = AssemblyDefinition.ReadAssembly(File.OpenRead(assembly.Location));
+			var definitionHigherVersion = AssemblyDefinition.ReadAssembly(File.OpenRead(assemblyHigherVersion.Location));
+			
+			return GetCompatibilityIssuesBetween(definition, definitionHigherVersion);
 		}
 
 		/// <summary>
@@ -97,7 +106,7 @@ namespace Versioning
 			}
 
 			return assembly.MainModule
-				           .Types
+						   .Types
 						   .FirstOrDefault(t => TypeResolutionEqualityComparer.Singleton.Equals(type, t));
 		}
 		/// <summary>

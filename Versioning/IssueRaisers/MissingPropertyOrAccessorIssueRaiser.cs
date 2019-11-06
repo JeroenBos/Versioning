@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,9 +7,9 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingPropertyOrAccessorIssueRaiser : ICompatiblityIssueRaiser<PropertyInfo>
+	public class MissingPropertyOrAccessorIssueRaiser : ICompatiblityIssueRaiser<PropertyDefinition>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(PropertyInfo property, PropertyInfo? resolved, IReadOnlyList<PropertyInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(PropertyDefinition property, PropertyDefinition? resolved, IReadOnlyList<PropertyDefinition> candidates)
 		{
 			if (resolved != null)
 				yield break;
@@ -20,7 +21,7 @@ namespace Versioning.IssueRaisers
 			}
 			else if (candidates.Count == 1)
 			{
-				PropertyInfo candidate = candidates[0];
+				var candidate = candidates[0];
 
 				var propertyAccessibility = property.GetAccessAndStaticModifiers();
 				var candidateAccessibility = candidate.GetAccessAndStaticModifiers();
@@ -30,10 +31,10 @@ namespace Versioning.IssueRaisers
 				}
 				else
 				{
-					var propertyGetter = property.GetGetMethod(true);
-					var propertySetter = property.GetSetMethod(true);
-					var candidateGetter = candidate.GetGetMethod(true);
-					var candidateSetter = candidate.GetSetMethod(true);
+					var propertyGetter = property.GetMethod;
+					var propertySetter = property.SetMethod;
+					var candidateGetter = candidate.GetMethod;
+					var candidateSetter = candidate.SetMethod;
 
 					if (propertyGetter != null)
 					{

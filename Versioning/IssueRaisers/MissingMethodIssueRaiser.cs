@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,9 +7,9 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingMethodIssueRaiser : ICompatiblityIssueRaiser<MethodInfo>
+	public class MissingMethodIssueRaiser : ICompatiblityIssueRaiser<MethodDefinition>
 	{
-		public IEnumerable<ICompatibilityIssue> Evaluate(MethodInfo method, MethodInfo? resolved, IReadOnlyList<MethodInfo> candidates)
+		public IEnumerable<ICompatibilityIssue> Evaluate(MethodDefinition method, MethodDefinition? resolved, IReadOnlyList<MethodDefinition> candidates)
 		{
 			if (resolved != null)
 				yield break;
@@ -28,7 +29,7 @@ namespace Versioning.IssueRaisers
 			}
 		}
 
-		internal static IEnumerable<MissingMethodIssue> EvaluateAccessModifierChange(MethodInfo method, MethodInfo candidate)
+		internal static IEnumerable<MissingMethodIssue> EvaluateAccessModifierChange(MethodDefinition method, MethodDefinition candidate)
 		{
 			var methodAccessibility = method.GetAccessAndStaticModifiers();
 			var candidateAccessibility = candidate.GetAccessAndStaticModifiers();

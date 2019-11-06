@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using Mono.Cecil;
 
 namespace Versioning
 {
@@ -12,12 +12,11 @@ namespace Versioning
 	/// <typeparam name="T"> The type of assembly element this can raise issues for.
 	/// Maybe the constraint should be relaxed.
 	/// For now it should only be one of 
-	/// - <see cref="Type"/>
-	/// - <see cref="MethodInfo"/>
-	/// - <see cref="ConstructorInfo"/>
-	/// - <see cref="FieldInfo"/>
-	/// - <see cref="PropertyInfo"/>
-	/// - <see cref="EventInfo"/>
+	/// - <see cref="TypeDefinition"/>
+	/// - <see cref="MethodDefinition"/>
+	/// - <see cref="FieldDefinition"/>
+	/// - <see cref="PropertyDefinition"/>
+	/// - <see cref="EventDefinition"/>
 	/// </typeparam>
 	public interface ICompatiblityIssueRaiser<in T> : ICompatiblityIssueRaiser where T : class
 	{

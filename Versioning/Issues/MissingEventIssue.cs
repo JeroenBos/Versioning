@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -7,8 +8,8 @@ namespace Versioning.Issues
 {
 	public class MissingPropertyIssue : ICompatibilityIssue
 	{
-		public PropertyInfo Property { get; }
-		public MissingPropertyIssue(PropertyInfo property)
+		public PropertyDefinition Property { get; }
+		public MissingPropertyIssue(PropertyDefinition property)
 		{
 			if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -20,8 +21,8 @@ namespace Versioning.Issues
 	public class MissingAccessorIssue : MissingMethodIssue
 	{
 		public PropertyAccessor Accessor { get; }
-		public PropertyInfo Property { get; }
-		public MissingAccessorIssue(PropertyInfo property, PropertyAccessor missingAccessor)
+		public PropertyDefinition Property { get; }
+		public MissingAccessorIssue(PropertyDefinition property, PropertyAccessor missingAccessor)
 			: base(property.Select(missingAccessor) ?? throw new ArgumentException("The accessor does not exist"))
 		{
 			this.Property = property;
@@ -40,18 +41,14 @@ namespace Versioning.Issues
 	}
 	public static class PropertyAccessorsExtensions
 	{
-		public static PropertyAccessor GetAccessorsEnum(this PropertyInfo propertyInfo)
+		public static PropertyAccessor GetAccessorsEnum(this PropertyDefinition propertyInfo)
 		{
 			if (propertyInfo == null) throw new ArgumentNullException(nameof(propertyInfo));
 
-			return (propertyInfo.CanRead ? PropertyAccessor.Get : PropertyAccessor.None)
-				| (propertyInfo.CanWrite ? PropertyAccessor.Set : PropertyAccessor.None);
+			return (propertyInfo.GetMethod != null ? PropertyAccessor.Get : PropertyAccessor.None)
+				| (propertyInfo.SetMethod != null ? PropertyAccessor.Set : PropertyAccessor.None);
 		}
-		public static PropertyAccessor Subtract(this PropertyAccessor _accessor, PropertyAccessor accessor)
-		{
-			return (int)_accessor - accessor;
-		}
-		public static MethodInfo? Select(this PropertyInfo property, PropertyAccessor accessor)
+		public static MethodDefinition? Select(this PropertyDefinition property, PropertyAccessor accessor)
 		{
 			if (accessor != PropertyAccessor.Get && accessor != PropertyAccessor.Set)
 				throw new ArgumentException(nameof(accessor));

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 
 namespace Versioning.Equality
@@ -14,11 +15,11 @@ namespace Versioning.Equality
 	/// - kind (interface, enum, etc)
 	/// 
 	/// </summary>
-	public class TypeResolutionEqualityComparer : IEqualityComparer<Type>
+	public class TypeResolutionEqualityComparer : IEqualityComparer<TypeDefinition>
 	{
 		public static readonly TypeResolutionEqualityComparer Singleton = new TypeResolutionEqualityComparer();
 
-		public bool Equals(Type? x, Type? y)
+		public bool Equals(TypeDefinition? x, TypeDefinition? y)
 		{
 			if (x != null && x.IsGenericParameter) throw new ArgumentException("Generic type parameters cannot be compared", nameof(x));
 			if (y != null && y.IsGenericParameter) throw new ArgumentException("Generic type parameters cannot be compared", nameof(y));
@@ -28,21 +29,9 @@ namespace Versioning.Equality
 			if (x == null ^ y == null)
 				return false;
 
-			if (x!.IsInterface != y!.IsInterface)
-				return false;
-			if (x.IsEnum != y.IsEnum)
-				return false;
-			if (x.IsClass != y.IsClass)
-				return false;
-			if (x.IsValueType != y.IsValueType)
-				return false;
-
-			return x.Name == y.Name
-				&& x.Namespace == y.Namespace
-				&& x.GetGenericArguments().Length == y.GetGenericArguments().Length
-				&& Equals(x.DeclaringType, y.DeclaringType);
+			return x!.FullName == y!.FullName;
 		}
 
-		public int GetHashCode(Type obj) => throw new NotImplementedException();
+		public int GetHashCode(TypeDefinition obj) => throw new NotImplementedException();
 	}
 }

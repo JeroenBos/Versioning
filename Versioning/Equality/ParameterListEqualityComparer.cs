@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Versioning.Equality
 {
-	public class ParameterListEqualityComparer : IEqualityComparer<IReadOnlyList<ParameterInfo>>
+	class ParameterListEqualityComparer : IEqualityComparer<IReadOnlyList<ParameterInfo>>
 	{
 		public static readonly ParameterListEqualityComparer Singleton = new ParameterListEqualityComparer();
 

@@ -6,7 +6,7 @@ using Mono.Cecil;
 
 namespace Versioning.Equality
 {
-	public class PropertyResolutionEqualityComparer : IEqualityComparer<PropertyDefinition>
+	class PropertyResolutionEqualityComparer : IEqualityComparer<PropertyDefinition>
 	{
 		public static readonly PropertyResolutionEqualityComparer Singleton = new PropertyResolutionEqualityComparer();
 

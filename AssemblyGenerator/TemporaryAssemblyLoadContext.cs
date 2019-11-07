@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Versioning
 {
-	public class TemporaryAssemblyLoadContext : AssemblyLoadContext
+	class TemporaryAssemblyLoadContext : AssemblyLoadContext
 	{
 		protected override Assembly Load(AssemblyName assemblyName)
 		{

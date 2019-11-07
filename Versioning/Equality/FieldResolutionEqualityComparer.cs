@@ -17,7 +17,7 @@ namespace Versioning.Equality
 	/// I don't even know if the following would be breaking binary compatibility:
 	/// - static? abstract? extern? partial? 
 	/// </summary>
-	public class FieldResolutionEqualityComparer : IEqualityComparer<FieldDefinition>
+	class FieldResolutionEqualityComparer : IEqualityComparer<FieldDefinition>
 	{
 		public static readonly FieldResolutionEqualityComparer Singleton = new FieldResolutionEqualityComparer();
 		public bool Equals(FieldDefinition x, FieldDefinition y)

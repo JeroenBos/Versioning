@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Versioning.Equality
 {
-	public class GenericParameterEqualityComparer : IEqualityComparer<Type>
+	class GenericParameterEqualityComparer : IEqualityComparer<Type>
 	{
 		public static readonly GenericParameterEqualityComparer Singleton = new GenericParameterEqualityComparer();
 

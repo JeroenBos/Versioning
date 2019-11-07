@@ -15,7 +15,7 @@ namespace Versioning.Equality
 	/// - kind (interface, enum, etc)
 	/// 
 	/// </summary>
-	public class TypeResolutionEqualityComparer : IEqualityComparer<TypeDefinition>
+	class TypeResolutionEqualityComparer : IEqualityComparer<TypeDefinition>
 	{
 		public static readonly TypeResolutionEqualityComparer Singleton = new TypeResolutionEqualityComparer();
 

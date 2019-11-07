@@ -21,7 +21,7 @@ namespace Versioning.Equality
 	/// - return type?
 	/// - return type ref/ref readonly modifiers?
 	/// </summary>
-	public class MethodResolutionEqualityComparer : IEqualityComparer<MethodDefinition>
+	class MethodResolutionEqualityComparer : IEqualityComparer<MethodDefinition>
 	{
 		public static readonly MethodResolutionEqualityComparer Singleton = new MethodResolutionEqualityComparer();
 

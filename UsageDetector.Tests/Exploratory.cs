@@ -18,9 +18,7 @@ namespace Versioning.UsageDetector.Tests
 										      .OrderBy(r => r.Name)
 										      .ToList();
 
-			Assert.AreEqual(2, allMethodCalls.Count);
-			Assert.AreEqual(".ctor", allMethodCalls[0].Name);
-			Assert.AreEqual("Abs", allMethodCalls[1].Name);
+			Assert.IsTrue(allMethodCalls.Select(m => m.Name).Contains("Abs"));
 		}
 
 		[Test]
@@ -42,9 +40,7 @@ class C {
 											  .OrderBy(r => r.Name)
 											  .ToList();
 
-			Assert.AreEqual(2, allMethodCalls.Count);
-			Assert.AreEqual(".ctor", allMethodCalls[0].Name);
-			Assert.AreEqual("Abs", allMethodCalls[1].Name);
+			Assert.IsTrue(allMethodCalls.Select(m => m.Name).Contains("Abs"));
 		}
 
 		[Test]
@@ -73,16 +69,14 @@ class C {
 		{
 			const string source = @"
 class C {
-	System.Type t = typeof(object);
+	System.Type t = typeof(System.String);
 }";
 			var assembly = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly(source));
-			var refs = UsageDetector.GetAllMemberReferences(assembly)
-									.OfType<TypeReference>()
+			var refs = UsageDetector.GetAllTypeAndMemberReferences(assembly)
 									.OrderBy(r => r.Name)
 									.ToList();
 
-			Assert.AreEqual(1, refs.Count);
-			Assert.AreEqual("Object", refs[0].Name);
+			Assert.IsTrue(refs.Select(r => r.Name).Contains("String"));
 		}
 
 

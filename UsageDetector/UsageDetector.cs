@@ -13,14 +13,9 @@ namespace Versioning.UsageDetector
 	{
 		public static IEnumerable<MemberReference> GetAllMemberReferences(AssemblyDefinition assembly)
 		{
-			// it suffices to only check in method bodies, because property/event accessors are implemented as methods as well,
-			// and e.g. field initializers are in the constructor. Local functions are also lowered to nonlocal functions, so it's fine
-			return from TypeDefinition type in assembly.MainModule.Types
-				   from MethodDefinition method in type.Methods
-				   where method.HasBody
-				   from Instruction instruction in method.Body.Instructions
-				   where instruction.Operand is MemberReference reference
-				   select instruction.Operand as MemberReference; ; // Hm. The name 'reference' does not exist in the current context
+			 return AllReferenceTypeObjectsIn(assembly)
+			 		.OfType<MemberReference>()
+			 		.Where(m => !(m is TypeReference));
 		}
 
 		public static IEnumerable<TypeReference> GetAllTypeReferences(AssemblyDefinition assembly)
@@ -94,6 +89,7 @@ namespace Versioning.UsageDetector
 		}
 
 		static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
+
 		/// <summary>
 		/// Ok, set out to solve the real problem:
 		/// Detect all type and member references to a particular assembly.
@@ -118,12 +114,14 @@ namespace Versioning.UsageDetector
 				   where locations.Count != 0
 				   select new DetectedCompatibilityIssue(issue, locations);
 		}
-		public static bool RefersIn(this MemberReference reference, AssemblyDefinition dependency)
+
+		static bool RefersIn(this MemberReference reference, AssemblyDefinition dependency)
 		{
 			var type = (reference.Resolve() as TypeDefinition) ?? reference.Resolve().DeclaringType;
 
 			return dependency.Equals(type.Module.Assembly);
 		}
+
 		/// <summary>
 		/// Locates where the potential compatibility issue would actually be an issue.
 		/// </summary>
@@ -136,7 +134,5 @@ namespace Versioning.UsageDetector
 			};
 			return locations;
 		}
-
-
 	}
 }

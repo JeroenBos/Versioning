@@ -6,6 +6,7 @@ using Mono.Cecil;
 using Assembly = System.Reflection.Assembly;
 using System.Collections.ObjectModel;
 using System.IO;
+using Versioning.IssueRaisers;
 
 namespace Versioning
 {
@@ -23,6 +24,19 @@ namespace Versioning
 	/// </summary>
 	public class CompatiblityIssueCollector
 	{
+		public static CompatiblityIssueCollector MissingMembersIssueCollector { get; } = createMissingMembersIssueCollector();
+		private static CompatiblityIssueCollector createMissingMembersIssueCollector()
+		{
+			var issueRaisers = new ICompatiblityIssueRaiser[] 
+			{
+				new MissingEventIssueRaiser(),
+				new MissingFieldIssueRaiser(),
+				new MissingMethodIssueRaiser(),
+				new MissingPropertyOrAccessorIssueRaiser(),
+				new MissingTypeIssueRaiser(),
+			};
+			return new CompatiblityIssueCollector(issueRaisers);
+		}
 		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
 		public bool RaiseWhenParentIsMissing { get; }
 		/// <param name="raiseWhenParentIsMissing"> Indicates whether issues should be raised on assembly elements evenwhen the declaring/parent assembly element is missing. </param>
@@ -46,7 +60,7 @@ namespace Versioning
 
 			var definition = AssemblyDefinition.ReadAssembly(File.OpenRead(assembly.Location));
 			var definitionHigherVersion = AssemblyDefinition.ReadAssembly(File.OpenRead(assemblyHigherVersion.Location));
-			
+
 			return GetCompatibilityIssuesBetween(definition, definitionHigherVersion);
 		}
 

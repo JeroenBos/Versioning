@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Versioning.Tests", "Version
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyGenerator", "AssemblyGenerator\AssemblyGenerator.csproj", "{7A13EEBA-D820-4A1A-BAB9-8A624E6A2C62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsageDetector", "UsageDetector\UsageDetector.csproj", "{FF9670E1-45C0-4207-BEF7-00EFFBF916AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UsageDetector", "UsageDetector\UsageDetector.csproj", "{FF9670E1-45C0-4207-BEF7-00EFFBF916AA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UsageDetector.Tests", "UsageDetector.Tests\UsageDetector.Tests.csproj", "{4B2B6766-F787-496C-A896-65582453D149}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI", "CLI\CLI.csproj", "{21FA1842-199B-4196-B7D9-A9B44D437D0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4B2B6766-F787-496C-A896-65582453D149}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B2B6766-F787-496C-A896-65582453D149}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B2B6766-F787-496C-A896-65582453D149}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21FA1842-199B-4196-B7D9-A9B44D437D0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21FA1842-199B-4196-B7D9-A9B44D437D0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21FA1842-199B-4196-B7D9-A9B44D437D0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21FA1842-199B-4196-B7D9-A9B44D437D0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

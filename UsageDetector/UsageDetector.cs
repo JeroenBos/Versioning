@@ -117,7 +117,7 @@ namespace Versioning.UsageDetector
 
 		static bool RefersIn(this MemberReference reference, AssemblyDefinition dependency)
 		{
-			var type = (reference.Resolve() as TypeDefinition) ?? reference.Resolve().DeclaringType;
+			var type = reference as TypeReference ?? reference.DeclaringType;
 
 			return dependency.Equals(type.Module.Assembly);
 		}

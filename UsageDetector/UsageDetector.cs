@@ -53,7 +53,7 @@ namespace Versioning.UsageDetector
 				if (obj == null || allObjects.Contains(obj))
 					return;
 
-				if (!obj.GetType().IsValueType && !obj.GetType().IsPointer)
+				if (!obj.GetType().IsValueType && !obj.GetType().IsPointer && !obj.GetType().IsNullable() && !obj.GetType().IsPrimitive)
 				{
 					allObjects.Add(obj);
 				}
@@ -93,6 +93,7 @@ namespace Versioning.UsageDetector
 			}
 		}
 
+		static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 		/// <summary>
 		/// Ok, set out to solve the real problem:
 		/// Detect all type and member references to a particular assembly.

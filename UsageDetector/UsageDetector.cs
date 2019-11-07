@@ -39,28 +39,23 @@ namespace Versioning.UsageDetector
 				.OfType<MemberReference>();
 		}
 
-		static IEnumerable<object> AllReferenceTypeObjectsIn(object obj, object? breakWhenItsThisOne = null)
+		static IEnumerable<object> AllReferenceTypeObjectsIn(object obj)
 		{
 			if (obj == null)
 				return Enumerable.Empty<object>();
 
 			var allObjects = new HashSet<object>(new ReferencEqualityComparer());
-			impl(obj, allObjects, breakWhenItsThisOne);
+			impl(obj, allObjects);
 			return allObjects;
 
-			static void impl(object obj, HashSet<object> allObjects, object? breakWhenItsThisOne)
+			static void impl(object obj, HashSet<object> allObjects)
 			{
 				if (obj == null || allObjects.Contains(obj))
 					return;
 
 				if (!obj.GetType().IsValueType && !obj.GetType().IsPointer)
-				if(ReferenceEquals(obj, breakWhenItsThisOne))
-				{
-
-				}
 				{
 					allObjects.Add(obj);
-					Trace.WriteLine(obj);
 				}
 
 				string assemblyName = obj.GetType().Assembly.GetName().Name;
@@ -90,10 +85,10 @@ namespace Versioning.UsageDetector
 
 				foreach (var value in allFieldValues)
 				{
-					impl(value, allObjects, breakWhenItsThisOne);
+					impl(value, allObjects);
 					if (value is IEnumerable enumerableValue)
 						foreach (var element in enumerableValue)
-							impl(element, allObjects, breakWhenItsThisOne);
+							impl(element, allObjects);
 				}
 			}
 		}

@@ -340,3 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 CLI/TestAssemblies/**
+CLI/Properties/launchSettings.json

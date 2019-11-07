@@ -99,24 +99,23 @@ namespace Versioning.UsageDetector
 		/// Detect all differences between two versions of that assembly.
 		/// Find the intersection.
 		/// </summary>
-		public static IEnumerable<DetectedCompatibilityIssue> Main(
+		public static IEnumerable<DetectedCompatibilityIssue> DetectCompatibilityIssues(
 			CompatiblityIssueCollector collector,
 			AssemblyDefinition main,
 			AssemblyDefinition dependency,
 			AssemblyDefinition dependencyHigherVersion)
 		{
 			var usage = GetAllTypeAndMemberReferences(main).Where(reference => reference.RefersIn(dependency))
-                                                           .ToList();
+														   .ToList();
 
-			throw new NotImplementedException();
-			// var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
-			// 					  .ToList();
-			// 
-			// 
-			// return from issue in issues
-			// 	   let locations = DetectIssue(issue, usage).ToList()
-			// 	   where locations.Count != 0
-			// 	   select new DetectedCompatibilityIssue(issue, locations);
+			var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
+								  .ToList();
+
+
+			return from issue in issues
+				   let locations = DetectIssue(issue, usage).ToList()
+				   where locations.Count != 0
+				   select new DetectedCompatibilityIssue(issue, locations);
 		}
 		public static bool RefersIn(this MemberReference reference, AssemblyDefinition dependency)
 		{

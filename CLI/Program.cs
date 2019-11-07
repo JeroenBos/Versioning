@@ -11,7 +11,7 @@ namespace Versioning.CLI
 	{
 		static void Main(string[] args)
 		{
-			if(args.Length != 2 && args.Length != 3)
+			if (args.Length != 2 && args.Length != 3)
 			{
 				Console.WriteLine("Expected 2 or 3 arguments:");
 				Console.WriteLine("- 2: Paths to an assembly and an assembly of higher version. Potential compatibility issues are listed.");
@@ -50,7 +50,6 @@ namespace Versioning.CLI
 				ListDifferences(assemblies[0], assemblies[1]);
 			}
 
-			Console.WriteLine("Done");
 			Console.ReadKey();
 		}
 
@@ -65,18 +64,47 @@ namespace Versioning.CLI
 			{
 				Console.WriteLine(detectedIssue.ToDisplayString());
 			}
+
+			if (detectedIssues.Count != 0)
+			{
+				Console.WriteLine("Done");
+			}
 		}
 
 		private static void ListDifferences(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion)
 		{
+			if (assembly.Name.Name != assemblyHigherVersion.Name.Name)
+			{
+				Console.WriteLine($"Warning: the same assembly but different versions should be specified, but got '{assembly.Name.Name}' and '{assemblyHigherVersion.Name.Name}'.");
+			}
+			else if (assembly.Name.Version >= assemblyHigherVersion.Name.Version)
+			{
+				Console.WriteLine($"Warning: the second argument did not point to an assembly of higher version.");
+			}
+
 			var issueCollector = CompatiblityIssueCollector.MissingMembersIssueCollector;
 			var potentialIssues = issueCollector.GetCompatibilityIssuesBetween(assembly, assemblyHigherVersion)
-				                                .ToList();
+												.ToList();
+			Console.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues");
+			Console.WriteLine($"between assembly {assembly.Name.Name} versions {assembly.Name.Version} and {assemblyHigherVersion.Name.Version}:");
+			Console.WriteLine();
 
-			Console.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues:");
-			foreach (var potentialIssue in potentialIssues)
+			foreach (var issueGroup in potentialIssues.GroupBy(d => d.ToHeaderDisplayString()))
 			{
-				Console.WriteLine(potentialIssue.ToDisplayString());
+				Console.WriteLine(issueGroup.Key); // the header
+
+				var sortedIssueGroup = issueGroup.Select(issue => issue.ToElementDisplayString()).OrderBy(_ => _);
+				foreach (string issue in sortedIssueGroup)
+				{
+					Console.Write("- ");
+					Console.WriteLine(issue);
+				}
+				Console.WriteLine();
+			}
+
+			if (potentialIssues.Count != 0)
+			{
+				Console.WriteLine("Done");
 			}
 		}
 

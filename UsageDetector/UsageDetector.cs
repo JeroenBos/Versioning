@@ -131,6 +131,7 @@ namespace Versioning.UsageDetector
 			var locations = potentialIssue switch
 			{
 				IMissingMemberCompatibilityIssue missingMemberIssue => references.Where(missingMemberIssue.MissingMember.Equals),
+				MemberAccessibilityReducedIssue issue => references.Where(issue.Member.Equals), // TODO: this could be more lenient, but for now this'll do
 				_ => throw new NotImplementedException()
 			};
 			return locations;

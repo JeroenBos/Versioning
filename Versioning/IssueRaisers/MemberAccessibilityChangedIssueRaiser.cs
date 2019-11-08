@@ -10,8 +10,8 @@ namespace Versioning.IssueRaisers
 	{
 		/// <param name="parent"> This represents the declaring type, but this extra parameter allows the property to be the 'declaring parent' of an accessor method. </param>
 		private static IEnumerable<ICompatibilityIssue> Evaluate(
-			IMemberDefinition member, 
-			IMemberDefinition? resolved, 
+			IMemberDefinition member,
+			IMemberDefinition? resolved,
 			IReadOnlyList<IMemberDefinition> candidates,
 			IMemberDefinition? declaringTypeOfResolved)
 		{
@@ -24,15 +24,15 @@ namespace Versioning.IssueRaisers
 					yield return accessorIssue;
 			}
 
-			// if the total (including transitively declaring types, if any) accessibility did not become less, do nothing
+			// if the total (including transitively declaring types, if any) accessibility did not become observably less, do nothing
 			var oldAccessibility = member.GetAccessibility();
 			var newAccessibility = resolved.GetAccessibility();
-			if (oldAccessibility <= newAccessibility)
+			if (oldAccessibility.IsAllowedToChangeTo(newAccessibility))
 				yield break;
 
-			// if the new accessibility is not less than the new parent accessibility, do nothing: the issue will be raised on the parent
+			// if the new accessibility is not observably less than the new parent accessibility, do nothing: the issue will be raised on the parent
 			var newParentAccessibility = declaringTypeOfResolved?.GetAccessibility() ?? AccessAndStaticModifiers.Public;
-			if (!(newAccessibility < newParentAccessibility))
+			if (newParentAccessibility.IsAllowedToChangeTo(newAccessibility))
 				yield break;
 
 			yield return new MemberAccessibilityReducedIssue(member, oldAccessibility, newAccessibility);

@@ -115,7 +115,11 @@ namespace Versioning
 			return (property.GetMethod?.IsPublic ?? false) || (property.SetMethod?.IsPublic ?? false);
 		}
 
-		public static bool AccessModifierChangeIsAllowedTo(this AccessAndStaticModifiers from, AccessAndStaticModifiers to)
+		/// <summary>
+		/// Returns whether the access modifier is allowed to change from <paramref name="from"/> to <paramref name="to"/>
+		/// without being observable outside of the assembly.
+		/// </summary>
+		public static bool IsAllowedToChangeTo(this AccessAndStaticModifiers from, AccessAndStaticModifiers to)
 		{
 			if ((from & AccessAndStaticModifiers.Static) != (to & AccessAndStaticModifiers.Static))
 				return false;

@@ -38,7 +38,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 		}
 
-
 		[Test]
 		public void ProtectedEventMadePrivateIsReported()
 		{
@@ -52,7 +51,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 		}
 
-
 		[Test]
 		public void InternalEventMadePrivateIsNotReported()
 		{
@@ -65,7 +63,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
-
 
 		[Test]
 		public void FieldMadePrivateIsReported()
@@ -93,7 +90,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 		}
 
-
 		[Test]
 		public void ProtectedFieldMadePrivateIsReported()
 		{
@@ -107,7 +103,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 		}
 
-
 		[Test]
 		public void InternalFieldMadePrivateIsNotReported()
 		{
@@ -120,8 +115,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
-
-
 
 		[Test]
 		public void MethodMadePrivateIsReported()
@@ -149,7 +142,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 		}
 
-
 		[Test]
 		public void NestedStructMadeProtectedIsReported()
 		{
@@ -170,6 +162,19 @@ namespace Versioning.Tests
 			// arrange
 			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected struct S { } }"));
 			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected internal struct S { }}"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
+		[Test]
+		public void MemberInInternalTypeReducesAccessibilityIsNotReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

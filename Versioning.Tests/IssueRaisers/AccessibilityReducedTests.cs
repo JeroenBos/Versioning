@@ -181,5 +181,74 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
+
+		[Test]
+		public void ProtectedMemberThatChangesToPrivateProtectedIsReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.IsAssignableFrom<MemberAccessibilityReducedIssue>(issues[0]);
+		}
+
+		[Test]
+		public void InternalProtectedMemberThatChangesToPrivateProtectedIsReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(1, issues.Count);
+			Assert.IsAssignableFrom<MemberAccessibilityReducedIssue>(issues[0]);
+		}
+
+		[Test]
+		public void PrivateProtectedMemberThatChangesToProtectedIsNotReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
+		[Test]
+		public void PrivateProtectedMemberThatChangesToInternalProtectedIsNotReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal protected int i; }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
+		[Test]
+		public void PrivateProtectedChangeInInternalClassIsNotReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { private protected int i;  internal protected int j; public int k; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { internal protected int i; private protected int j;  private int k; }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
+
 	}
 }

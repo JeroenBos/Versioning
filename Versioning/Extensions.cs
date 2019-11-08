@@ -124,23 +124,7 @@ namespace Versioning
 			if ((from & AccessAndStaticModifiers.Static) != (to & AccessAndStaticModifiers.Static))
 				return false;
 
-			// TODO: check protected -> private protected is not allowed
-			bool wasFamily = (from & AccessAndStaticModifiers.Family) == AccessAndStaticModifiers.Family;
-			bool isFamily = (to & AccessAndStaticModifiers.Family) == AccessAndStaticModifiers.Family;
-
-			bool wasPublic = (from & AccessAndStaticModifiers.Public) == AccessAndStaticModifiers.Public;
-			bool isPublic = (to & AccessAndStaticModifiers.Public) == AccessAndStaticModifiers.Public;
-
-
-			if (wasPublic && !isPublic)
-				return false;
-
-			// note that '!isPublic' is redundant: per the but layout, if xFamily is false, then xPublic must be false as well
-			if (wasFamily && !isFamily && !isPublic)
-				return false;
-
-			// every other access modifier change does not affect compatibility
-			return true;
+			return from <= to || from <= AccessAndStaticModifiers.Assembly;
 		}
 
 		/// <summary>

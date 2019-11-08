@@ -37,6 +37,10 @@ namespace Versioning
 		/// Returns a value representing the accessibility modifiers of the specified member.
 		/// </summary>
 		public static AccessAndStaticModifiers GetAccessibilityModifiers(this IMemberDefinition member) => member.GetAccessAndStaticModifiers() & AccessAndStaticModifiers.AccessMask;
+		
+		/// <summary>
+		/// Gets the total accessibility of the specified member, i.e. can be reduced by the declaring types.
+		/// </summary>
 		public static AccessAndStaticModifiers GetAccessibility(this IMemberDefinition member) => member.GetAccessibilityAndStatic() & AccessAndStaticModifiers.AccessMask;
 
 		public static AccessAndStaticModifiers GetAccessibilityAndStatic(this IMemberDefinition member)

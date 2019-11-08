@@ -124,7 +124,6 @@ namespace Versioning.Tests
 			Assert.AreEqual("A", ((MemberAccessibilityReducedIssue)issues[0]).Member.Name);
 		}
 
-
 		[Test]
 		public void AccessorMadePrivateIsReported()
 		{
@@ -153,7 +152,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(PropertyAccessor.Set, ((MissingAccessorIssue)issues[0]).Accessor);
 		}
 
-
 		[Test]
 		public void AccessorMadePrivateFromProtectedIsReported()
 		{
@@ -181,7 +179,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 			Assert.IsAssignableFrom<MissingMemberIssue>(issues[0]);
 		}
-		public class A { public int this[object obj] { get => 0;  set { } } }
 
 		[Test]
 		public void MissingIndexerGetterIsReported()
@@ -196,6 +193,7 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 			Assert.AreEqual(PropertyAccessor.Get, ((MissingAccessorIssue)issues[0]).Accessor);
 		}
+
 		[Test]
 		public void MissingIndexerSetterIsReported()
 		{

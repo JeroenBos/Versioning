@@ -40,7 +40,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(0, issues.Count);
 		}
 
-
 		[Test]
 		public void MissingEventIsReported()
 		{
@@ -68,7 +67,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(0, issues.Count);
 		}
 
-
 		[Test]
 		public void EventOnMissingTypeIsNotReported()
 		{
@@ -81,7 +79,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
-
 
 		[Test]
 		public void FieldOnMissingTypeIsNotReported()
@@ -109,7 +106,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 			Assert.IsAssignableFrom<MissingMemberIssue>(issues[0]);
 		}
-
 
 		[Test]
 		public void MissingMethodIsReported()
@@ -140,7 +136,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(0, issues.Count);
 		}
 
-
 		[Test]
 		public void ParameterRemovalIsReported()
 		{
@@ -166,7 +161,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(1, issues.Count);
 		}
-
 
 		[Test]
 		public void RefParameterModifierRemovalIsReported()
@@ -194,7 +188,6 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 		}
 
-
 		[Test]
 		public void ReturnTypeChangeIsReported()
 		{
@@ -207,7 +200,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(1, issues.Count);
 		}
-
 
 		[Test]
 		public void MissingClassIsReported()
@@ -237,8 +229,6 @@ namespace Versioning.Tests
 
 			Assert.AreEqual(0, issues.Count);
 		}
-
-
 
 		[Test]
 		public void MissingNestedDelegateIsReported()

@@ -7,7 +7,7 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingFieldIssueRaiser : ICompatiblityIssueRaiser<FieldDefinition>
+	public class MissingFieldIssueRaiser : ICompatibilityIssueRaiser<FieldDefinition>
 	{
 		public IEnumerable<ICompatibilityIssue> Evaluate(FieldDefinition field, FieldDefinition? resolved, IReadOnlyList<FieldDefinition> candidates)
 		{

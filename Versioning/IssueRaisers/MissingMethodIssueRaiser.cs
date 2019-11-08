@@ -7,7 +7,7 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingMethodIssueRaiser : ICompatiblityIssueRaiser<MethodDefinition>
+	public class MissingMethodIssueRaiser : ICompatibilityIssueRaiser<MethodDefinition>
 	{
 		public static IEnumerable<ICompatibilityIssue> Evaluate(MethodDefinition method, MethodDefinition? resolved, IReadOnlyList<MethodDefinition> candidates)
 		{
@@ -27,6 +27,6 @@ namespace Versioning.IssueRaisers
 			}
 		}
 
-		IEnumerable<ICompatibilityIssue> ICompatiblityIssueRaiser<MethodDefinition>.Evaluate(MethodDefinition method, MethodDefinition? resolved, IReadOnlyList<MethodDefinition> candidates) => Evaluate(method, resolved, candidates);
+		IEnumerable<ICompatibilityIssue> ICompatibilityIssueRaiser<MethodDefinition>.Evaluate(MethodDefinition method, MethodDefinition? resolved, IReadOnlyList<MethodDefinition> candidates) => Evaluate(method, resolved, candidates);
 	}
 }

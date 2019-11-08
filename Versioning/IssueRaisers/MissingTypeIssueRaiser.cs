@@ -6,7 +6,7 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingTypeIssueRaiser : ICompatiblityIssueRaiser<TypeDefinition>
+	public class MissingTypeIssueRaiser : ICompatibilityIssueRaiser<TypeDefinition>
 	{
 		public IEnumerable<ICompatibilityIssue> Evaluate(TypeDefinition type, TypeDefinition? resolved, IReadOnlyList<TypeDefinition> candidates)
 		{

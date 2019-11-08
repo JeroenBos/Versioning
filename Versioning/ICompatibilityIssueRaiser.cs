@@ -18,7 +18,7 @@ namespace Versioning
 	/// - <see cref="PropertyDefinition"/>
 	/// - <see cref="EventDefinition"/>
 	/// </typeparam>
-	public interface ICompatiblityIssueRaiser<in T> : ICompatiblityIssueRaiser where T : class
+	public interface ICompatibilityIssueRaiser<in T> : ICompatiblityIssueRaiser where T : class
 	{
 		/// <summary>
 		/// Gets all issues on the specified element and its resolved counterparts in the other assembly.

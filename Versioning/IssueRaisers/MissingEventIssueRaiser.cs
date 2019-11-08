@@ -7,7 +7,7 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingEventIssueRaiser : ICompatiblityIssueRaiser<EventDefinition>
+	public class MissingEventIssueRaiser : ICompatibilityIssueRaiser<EventDefinition>
 	{
 		public IEnumerable<ICompatibilityIssue> Evaluate(EventDefinition @event, EventDefinition? resolved, IReadOnlyList<EventDefinition> candidates)
 		{

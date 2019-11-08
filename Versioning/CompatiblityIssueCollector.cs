@@ -222,13 +222,14 @@ namespace Versioning
 			return this.GetIssueRaisers<T>()
 					   .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
 		}
+
 		/// <summary>
 		/// Gets the issue raisers applicable on <typeparamref name="T"/>.
 		/// </summary>
-		private IEnumerable<ICompatiblityIssueRaiser<T>> GetIssueRaisers<T>() where T : class
+		private IEnumerable<ICompatibilityIssueRaiser<T>> GetIssueRaisers<T>() where T : class
 		{
 			foreach (var raiser in this.IssueRaisers)
-				if (raiser is ICompatiblityIssueRaiser<T> typedRaiser)
+				if (raiser is ICompatibilityIssueRaiser<T> typedRaiser)
 					yield return typedRaiser;
 		}
 	}

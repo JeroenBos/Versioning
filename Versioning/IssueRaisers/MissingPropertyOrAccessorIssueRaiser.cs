@@ -7,7 +7,7 @@ using Versioning.Issues;
 
 namespace Versioning.IssueRaisers
 {
-	public class MissingPropertyOrAccessorIssueRaiser : ICompatiblityIssueRaiser<PropertyDefinition>
+	public class MissingPropertyOrAccessorIssueRaiser : ICompatibilityIssueRaiser<PropertyDefinition>
 	{
 		public IEnumerable<ICompatibilityIssue> Evaluate(PropertyDefinition property, PropertyDefinition? resolved, IReadOnlyList<PropertyDefinition> candidates)
 		{

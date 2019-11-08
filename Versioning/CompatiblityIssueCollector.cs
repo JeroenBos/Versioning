@@ -27,7 +27,7 @@ namespace Versioning
 		public static CompatiblityIssueCollector MissingMembersIssueCollector { get; } = createMissingMembersIssueCollector();
 		private static CompatiblityIssueCollector createMissingMembersIssueCollector()
 		{
-			var issueRaisers = new ICompatiblityIssueRaiser[] 
+			var issueRaisers = new ICompatiblityIssueRaiser[]
 			{
 				new MissingEventIssueRaiser(),
 				new MissingFieldIssueRaiser(),
@@ -42,11 +42,27 @@ namespace Versioning
 		/// <param name="raiseWhenParentIsMissing"> Indicates whether issues should be raised on assembly elements evenwhen the declaring/parent assembly element is missing. </param>
 		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers, bool raiseWhenParentIsMissing = false)
 		{
-			if (issueRaisers == null) throw new ArgumentNullException(nameof(issueRaisers));
+			if (issueRaisers == null)
+				throw new ArgumentNullException(nameof(issueRaisers));
+
+			var acceptedIssueRaiserTypes = new[]
+			{
+				typeof(ICompatibilityIssueRaiser<IMemberDefinition>),
+				typeof(ICompatibilityIssueRaiser<TypeDefinition>),
+				typeof(ICompatibilityIssueRaiser<PropertyDefinition>),
+				typeof(ICompatibilityIssueRaiser<EventDefinition>),
+				typeof(ICompatibilityIssueRaiser<FieldDefinition>),
+				typeof(ICompatibilityIssueRaiser<MethodDefinition>),
+			};
+
+			if (!issueRaisers.Any(issueRaiser => acceptedIssueRaiserTypes.Any(acceptedType => acceptedType.IsAssignableFrom(issueRaiser.GetType()))))
+				throw new ArgumentException("Invalid generic parameter on a specified issue raiser");
 
 			this.IssueRaisers = issueRaisers;
 			this.RaiseWhenParentIsMissing = raiseWhenParentIsMissing;
 		}
+
+
 
 		/// <summary>
 		/// Returns all compatibility issues between the specified assemblies, as raised by <see cref="IssueRaisers"/>.

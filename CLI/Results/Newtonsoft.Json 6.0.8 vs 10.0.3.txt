@@ -1,0 +1,42 @@
+Detected 34 potential compatibility issues
+between assembly Newtonsoft.Json versions 6.0.0.0 and 10.0.0.0:
+
+The following members were not present in the newer assembly:
+- Newtonsoft.Json.Bson.BsonReader::ReadAsBytes
+- Newtonsoft.Json.Bson.BsonReader::ReadAsDateTime
+- Newtonsoft.Json.Bson.BsonReader::ReadAsDateTimeOffset
+- Newtonsoft.Json.Bson.BsonReader::ReadAsDecimal
+- Newtonsoft.Json.Bson.BsonReader::ReadAsInt32
+- Newtonsoft.Json.Bson.BsonReader::ReadAsString
+- Newtonsoft.Json.Converters.JsonValueConverter
+- Newtonsoft.Json.JsonConvert::DeserializeObjectAsync
+- Newtonsoft.Json.JsonConvert::DeserializeObjectAsync
+- Newtonsoft.Json.JsonConvert::DeserializeObjectAsync
+- Newtonsoft.Json.JsonConvert::DeserializeObjectAsync
+- Newtonsoft.Json.JsonConvert::PopulateObjectAsync
+- Newtonsoft.Json.JsonConvert::SerializeObjectAsync
+- Newtonsoft.Json.JsonConvert::SerializeObjectAsync
+- Newtonsoft.Json.JsonConvert::SerializeObjectAsync
+- Newtonsoft.Json.JsonConverter::GetSchema
+- Newtonsoft.Json.Linq.JTokenReader::ReadAsBytes
+- Newtonsoft.Json.Linq.JTokenReader::ReadAsDateTime
+- Newtonsoft.Json.Linq.JTokenReader::ReadAsDateTimeOffset
+- Newtonsoft.Json.Linq.JTokenReader::ReadAsDecimal
+- Newtonsoft.Json.Linq.JTokenReader::ReadAsInt32
+- Newtonsoft.Json.Linq.JTokenReader::ReadAsString
+- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver::ResolvePropertyName
+- Newtonsoft.Json.Serialization.DefaultContractResolver::.ctor
+- Newtonsoft.Json.Serialization.JsonContract::OnDeserialized
+- Newtonsoft.Json.Serialization.JsonContract::OnDeserializing
+- Newtonsoft.Json.Serialization.JsonContract::OnError
+- Newtonsoft.Json.Serialization.JsonContract::OnSerialized
+- Newtonsoft.Json.Serialization.JsonContract::OnSerializing
+- Newtonsoft.Json.Serialization.JsonDictionaryContract::PropertyNameResolver
+- Newtonsoft.Json.Serialization.JsonObjectContract::ConstructorParameters
+- Newtonsoft.Json.Serialization.JsonObjectContract::OverrideConstructor
+- Newtonsoft.Json.Serialization.JsonObjectContract::ParametrizedConstructor
+
+The following members reduced their visibility in the newer assembly:
+- Newtonsoft.Json.Serialization.DefaultContractResolver::ResolvePropertyName (FamORAssem -> Family)
+
+Done

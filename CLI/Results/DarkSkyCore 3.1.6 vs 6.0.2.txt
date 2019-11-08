@@ -1,0 +1,22 @@
+﻿Warning: the second argument did not point to an assembly of higher version.
+Detected 15 potential compatibility issues
+between assembly DarkSkyCore versions 3.1.6.0 and 0.0.0.0:
+
+The following members were not present in the newer assembly:
+- DarkSky.Models.DarkSkyResponse::Headers
+- DarkSky.Models.DarkSkyResponse::ResponseHeaders
+- DarkSky.Models.Flags::DarkskyStations
+- DarkSky.Models.Flags::IsdStations
+- DarkSky.Models.Flags::LampStations
+- DarkSky.Models.Flags::MadisStations
+- DarkSky.Models.Flags::MetnoLicense
+- DarkSky.Models.Flags::NearestStation
+- DarkSky.Services.DarkSkyService::.ctor
+- DarkSky.Services.DarkSkyService::GetForecast
+- DarkSky.Services.DarkSkyService::OptionalParameters
+- DarkSky.Services.ExclusionBlock
+- DarkSky.Services.IHttpClient::HttpRequest
+- DarkSky.Services.ZipHttpClient::.ctor
+- DarkSky.Services.ZipHttpClient::HttpRequest
+
+Done

@@ -86,7 +86,7 @@ namespace Versioning.CLI
 			var potentialIssues = issueCollector.GetCompatibilityIssuesBetween(assembly, assemblyHigherVersion)
 												.ToList();
 			Console.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues");
-			Console.WriteLine($"between assembly {assembly.Name.Name} versions {assembly.Name.Version} and {assemblyHigherVersion.Name.Version}:");
+			Console.WriteLine($"between assembly {assembly.Name.Name} versions {assembly.Name.Version} and {assemblyHigherVersion.Name.Version}{(potentialIssues.Count == 0 ? '.' : ':')}");
 			Console.WriteLine();
 
 			foreach (var issueGroup in potentialIssues.GroupBy(d => d.ToHeaderDisplayString()))

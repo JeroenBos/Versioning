@@ -24,45 +24,25 @@ namespace Versioning
 	/// </summary>
 	public class CompatiblityIssueCollector
 	{
-		public static CompatiblityIssueCollector MissingMembersIssueCollector { get; } = createMissingMembersIssueCollector();
-		private static CompatiblityIssueCollector createMissingMembersIssueCollector()
+		public static CompatiblityIssueCollector Default { get; } = createDefault();
+		private static CompatiblityIssueCollector createDefault()
 		{
 			var issueRaisers = new ICompatiblityIssueRaiser[]
 			{
-				new MissingEventIssueRaiser(),
-				new MissingFieldIssueRaiser(),
-				new MissingMethodIssueRaiser(),
-				new MissingPropertyOrAccessorIssueRaiser(),
-				new MissingTypeIssueRaiser(),
+				new MissingMemberIssueRaiser(),
+				new MemberAccessibilityReducedIssueRaiser(),
 			};
 			return new CompatiblityIssueCollector(issueRaisers);
 		}
 		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
-		public bool RaiseWhenParentIsMissing { get; }
 		/// <param name="raiseWhenParentIsMissing"> Indicates whether issues should be raised on assembly elements evenwhen the declaring/parent assembly element is missing. </param>
-		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers, bool raiseWhenParentIsMissing = false)
+		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers)
 		{
 			if (issueRaisers == null)
 				throw new ArgumentNullException(nameof(issueRaisers));
 
-			var acceptedIssueRaiserTypes = new[]
-			{
-				typeof(ICompatibilityIssueRaiser<IMemberDefinition>),
-				typeof(ICompatibilityIssueRaiser<TypeDefinition>),
-				typeof(ICompatibilityIssueRaiser<PropertyDefinition>),
-				typeof(ICompatibilityIssueRaiser<EventDefinition>),
-				typeof(ICompatibilityIssueRaiser<FieldDefinition>),
-				typeof(ICompatibilityIssueRaiser<MethodDefinition>),
-			};
-
-			if (!issueRaisers.Any(issueRaiser => acceptedIssueRaiserTypes.Any(acceptedType => acceptedType.IsAssignableFrom(issueRaiser.GetType()))))
-				throw new ArgumentException("Invalid generic parameter on a specified issue raiser");
-
 			this.IssueRaisers = issueRaisers;
-			this.RaiseWhenParentIsMissing = raiseWhenParentIsMissing;
 		}
-
-
 
 		/// <summary>
 		/// Returns all compatibility issues between the specified assemblies, as raised by <see cref="IssueRaisers"/>.
@@ -103,18 +83,14 @@ namespace Versioning
 			if (otherType == null)
 				return issues;
 
-			if (!this.RaiseWhenParentIsMissing)
-			{
-				bool isParentMissing = issues.OfType<Issues.MissingTypeIssue>().Any();
-				if (isParentMissing)
-					return issues;
-			}
-
-			var nestedIssues = type.GetFamilyAndPublicMembers().SelectMany(member => member switch
+			var nestedIssues = type.GetFamilyAndPublicMembers()
+				                   .SelectMany(member => member switch
 			{
 				FieldDefinition f => GetIssuesOn(f, this.ResolveField(f, otherType), this.ResolveFieldCandidates(f, otherType)),
 				PropertyDefinition p => GetIssuesOn(p, this.ResolveProperty(p, otherType), this.ResolvePropertyCandidates(p, otherType)),
-				MethodDefinition m => GetIssuesOn(m, this.ResolveMethod(m, otherType), this.ResolveMethodCandidates(m, otherType)),
+				MethodDefinition m when m.SemanticsAttributes == MethodSemanticsAttributes.None
+								   => GetIssuesOn(m, this.ResolveMethod(m, otherType), this.ResolveMethodCandidates(m, otherType)),
+				MethodDefinition _ => Enumerable.Empty<ICompatibilityIssue>(),
 				EventDefinition e => GetIssuesOn(e, this.ResolveEvent(e, otherType), this.ResolveEventCandidates(e, otherType)),
 				TypeDefinition nt => GetIssuesOn(nt, this.ResolveType(nt, otherType), this.ResolveTypeCandidates(nt, otherType)),
 				_ => throw new Exception()
@@ -160,7 +136,7 @@ namespace Versioning
 		/// </summary>
 		private MethodDefinition? ResolveMethod(MethodDefinition method, TypeDefinition type)
 		{
-			return type.GetMethodsAccessibleLike(method)
+			return type.Methods
 					   .FirstOrDefault(m => MethodResolutionEqualityComparer.Singleton.Equals(m, method));
 		}
 
@@ -169,7 +145,7 @@ namespace Versioning
 		/// </summary>
 		private IReadOnlyList<MethodDefinition> ResolveMethodCandidates(MethodDefinition method, TypeDefinition type)
 		{
-			return type.GetMethodsAccessibleLike(method)
+			return type.Methods
 					   .Where(mi => mi.Name == method.Name)
 					   .ToList();
 		}
@@ -190,7 +166,9 @@ namespace Versioning
 		/// </summary>
 		private IReadOnlyList<EventDefinition> ResolveEventCandidates(EventDefinition @event, TypeDefinition type)
 		{
-			return new ReadOnlyCollection<EventDefinition>(type.Events);
+			return type.Events
+				       .Where(e => @event.Name == e.Name)
+				       .ToList();
 		}
 
 		/// <summary>
@@ -198,7 +176,7 @@ namespace Versioning
 		/// </summary>
 		private PropertyDefinition? ResolveProperty(PropertyDefinition property, TypeDefinition type)
 		{
-			return type.GetPropertiesAccessibleLike(property)
+			return type.Properties
 					   .Where(p => PropertyResolutionEqualityComparer.Singleton.Equals(p, property))
 					   .FirstOrDefault();
 		}
@@ -207,7 +185,9 @@ namespace Versioning
 		/// </summary>
 		private IReadOnlyList<PropertyDefinition> ResolvePropertyCandidates(PropertyDefinition property, TypeDefinition type)
 		{
-			return new ReadOnlyCollection<PropertyDefinition>(type.Properties);
+			return type.Properties
+					   .Where(p => property.Name == p.Name)
+					   .ToList();
 		}
 
 		/// <summary>
@@ -215,32 +195,28 @@ namespace Versioning
 		/// </summary>
 		private FieldDefinition? ResolveField(FieldDefinition field, TypeDefinition type)
 		{
-			var candidate = type.Fields.FirstOrDefault(f => f.Name == field.Name);
-
-			if (candidate != null && FieldResolutionEqualityComparer.Singleton.Equals(field, candidate))
-				return candidate;
-			return null;
+			return type.Fields
+					   .Where(p => FieldResolutionEqualityComparer.Singleton.Equals(p, field))
+					   .FirstOrDefault();
 		}
 		/// <summary>
 		/// Returns all fields in the specified type with the same name.
 		/// </summary>
 		private IReadOnlyList<FieldDefinition> ResolveFieldCandidates(FieldDefinition field, TypeDefinition type)
 		{
-			return new ReadOnlyCollection<FieldDefinition>(type.Fields);
+			return type.Fields
+					   .Where(f => field.Name == f.Name)
+					   .ToList();
 		}
 
 		/// <summary>
 		/// Gets the issues raised by the issue raisers applicable on <paramref name="element"/>, 
 		/// given the resolved equivalent of the element in the other assembly, and candidates.
 		/// </summary>
-		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, T? equivalentElement, IReadOnlyList<T> candidates) where T : class, IMemberDefinition
+		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, T? equivalentElement, IReadOnlyList<T> candidates) where T : class
 		{
-			var result = this.GetIssueRaisers<T>()
-							 .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
-
-			if (typeof(T) == typeof(IMemberDefinition))
-				return result;
-			return result.Concat(GetIssuesOn<IMemberDefinition>(element, equivalentElement, candidates));
+			return this.GetIssueRaisers<T>()
+					   .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
 		}
 
 		/// <summary>

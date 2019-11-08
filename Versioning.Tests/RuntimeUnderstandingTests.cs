@@ -8,7 +8,7 @@ namespace Versioning.Tests
 	/// <summary>
 	/// I don't know a whole lot about how exactly the runtime resolves assembly items regarding assembly versions, so I'll just check it out a bit.
 	/// </summary>
-	public class A
+	public class RuntimeUnderstandingTests
 	{
 		[Test]
 		public void LoadAssemblyWithReference()

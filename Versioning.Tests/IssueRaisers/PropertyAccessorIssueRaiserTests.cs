@@ -9,9 +9,9 @@ using Versioning.Issues;
 
 namespace Versioning.Tests
 {
-	public class MissingPropertyOrAccessorIssueRaiserTests
+	public class PropertyAccessorIssueRaiserTests
 	{
-		private CompatiblityIssueCollector raiser = new MissingPropertyOrAccessorIssueRaiser().ToSingleton();
+		private CompatiblityIssueCollector raiser = CompatiblityIssueCollector.Default;
 
 		[Test]
 		public void MissingPropertyIsReported()
@@ -24,7 +24,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.IsAssignableFrom<MissingPropertyIssue>(issues[0]);
+			Assert.IsAssignableFrom<MissingMemberIssue>(issues[0]);
 		}
 
 		[Test]
@@ -38,7 +38,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.IsAssignableFrom<MissingPropertyIssue>(issues[0]);
+			Assert.IsAssignableFrom<MissingMemberIssue>(issues[0]);
 		}
 
 		[Test]
@@ -119,7 +119,9 @@ namespace Versioning.Tests
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
-			Assert.AreEqual(0, issues.Count);
+			Assert.AreEqual(1, issues.Count);
+			Assert.IsAssignableFrom<MemberAccessibilityReducedIssue>(issues[0]);
+			Assert.AreEqual("A", ((MemberAccessibilityReducedIssue)issues[0]).Member.Name);
 		}
 
 
@@ -163,7 +165,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.IsTrue(((MissingMethodIssue)issues[0]).MissingMethod.Name.StartsWith("set"));
+			Assert.IsTrue(((MissingMemberIssue)issues[0]).MissingMember.Name.StartsWith("set"));
 		}
 
 		[Test]
@@ -177,7 +179,7 @@ namespace Versioning.Tests
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
 
 			Assert.AreEqual(1, issues.Count);
-			Assert.IsAssignableFrom<MissingPropertyIssue>(issues[0]);
+			Assert.IsAssignableFrom<MissingMemberIssue>(issues[0]);
 		}
 		public class A { public int this[object obj] { get => 0;  set { } } }
 

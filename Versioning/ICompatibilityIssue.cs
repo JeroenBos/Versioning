@@ -10,8 +10,5 @@ namespace Versioning
 	{
 
 	}
-	public interface IMissingMemberCompatibilityIssue : ICompatibilityIssue
-	{
-		IMemberDefinition MissingMember { get; }
-	}
+
 }

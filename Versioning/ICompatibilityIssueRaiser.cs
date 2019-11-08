@@ -29,6 +29,7 @@ namespace Versioning
 		/// the element that would be resolved. </param>
 		/// <param name="candidates"> The assembly elements in the other assembly that almost matched. </param>
 		IEnumerable<ICompatibilityIssue> Evaluate(T element, T? resolvedElement, IReadOnlyList<T> candidates);
+
 	}
 
 }

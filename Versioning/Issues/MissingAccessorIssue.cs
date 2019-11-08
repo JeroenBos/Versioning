@@ -19,7 +19,7 @@ namespace Versioning.Issues
 	}
 
 
-	public class MissingAccessorIssue : MissingMethodIssue
+	public class MissingAccessorIssue : MissingMemberIssue
 	{
 		public PropertyAccessor Accessor { get; }
 		public PropertyDefinition Property { get; }

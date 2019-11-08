@@ -55,7 +55,7 @@ namespace Versioning.CLI
 
 		private static void ListIssues(AssemblyDefinition main, AssemblyDefinition dependency, AssemblyDefinition dependencyHigherVersion)
 		{
-			var issueCollector = CompatiblityIssueCollector.MissingMembersIssueCollector;
+			var issueCollector = CompatiblityIssueCollector.Default;
 			var detectedIssues = IssueDetector.DetectCompatibilityIssues(issueCollector, main, dependency, dependencyHigherVersion)
 											  .ToList();
 
@@ -82,7 +82,7 @@ namespace Versioning.CLI
 				Console.WriteLine($"Warning: the second argument did not point to an assembly of higher version.");
 			}
 
-			var issueCollector = CompatiblityIssueCollector.MissingMembersIssueCollector;
+			var issueCollector = CompatiblityIssueCollector.Default;
 			var potentialIssues = issueCollector.GetCompatibilityIssuesBetween(assembly, assemblyHigherVersion)
 												.ToList();
 			Console.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues");
@@ -93,7 +93,7 @@ namespace Versioning.CLI
 			{
 				Console.WriteLine(issueGroup.Key); // the header
 
-				var sortedIssueGroup = issueGroup.Select(issue => issue.ToElementDisplayString()).OrderBy(_ => _);
+				var sortedIssueGroup = issueGroup.Select(issue => issue.ToDisplayString()).OrderBy(_ => _);
 				foreach (string issue in sortedIssueGroup)
 				{
 					Console.Write("- ");

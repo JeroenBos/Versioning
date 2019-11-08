@@ -21,10 +21,37 @@ namespace Versioning
 				foreach (T element in sequence)
 					yield return element;
 		}
+
+		public static IEnumerable<T> Unfold<T>(this T element, Func<T, T> selectNext) where T : class
+		{
+			for (var result = element; result != null; result = selectNext(result))
+			{
+				yield return result;
+			}
+		}
+		public static IEnumerable<IMemberDefinition> GetDeclaringTypesAndSelf(this IMemberDefinition member)
+		{
+			return member.Unfold(member => member.DeclaringType);
+		}
 		/// <summary>
 		/// Returns a value representing the accessibility modifiers of the specified member.
 		/// </summary>
 		public static AccessAndStaticModifiers GetAccessibilityModifiers(this IMemberDefinition member) => member.GetAccessAndStaticModifiers() & AccessAndStaticModifiers.AccessMask;
+		public static AccessAndStaticModifiers GetAccessibility(this IMemberDefinition member) => member.GetAccessibilityAndStatic() & AccessAndStaticModifiers.AccessMask;
+
+		public static AccessAndStaticModifiers GetAccessibilityAndStatic(this IMemberDefinition member)
+		{
+			return member.GetDeclaringTypesAndSelf()
+				         .Select(GetAccessAndStaticModifiers)
+				         .Aggregate(GetLeastAccessible);
+		}
+
+
+		public static AccessAndStaticModifiers GetAccessibilityAndStatic(this IMemberDefinition member, out AccessAndStaticModifiers directAccessibility)
+		{
+			directAccessibility = member.GetAccessAndStaticModifiers();
+			return member.GetAccessibilityAndStatic();
+		}
 
 
 		/// <summary>
@@ -56,24 +83,7 @@ namespace Versioning
 			};
 			return accessFlags & AccessAndStaticModifiers.Mask;
 		}
-
 		public static bool IsStatic(this TypeDefinition type) => type.IsAbstract && type.IsSealed;
-
-		/// <summary>
-		/// Gets all methods on the specified type with the same public, protected and static modifiers as the specified info.
-		/// </summary>
-		public static IEnumerable<MethodDefinition> GetMethodsAccessibleLike(this TypeDefinition type, MethodDefinition method)
-		{
-			return type.Methods.Where(m => m.GetAccessibilityModifiers() == method.GetAccessibilityModifiers());
-		}
-
-		/// <summary>
-		/// Gets all constructors on the specified type with the same public, protected and static modifiers as the specified info.
-		/// </summary>
-		public static IEnumerable<PropertyDefinition> GetPropertiesAccessibleLike(this TypeDefinition type, PropertyDefinition property)
-		{
-			return type.Properties.Where(p => p.GetAccessibilityModifiers() == property.GetAccessibilityModifiers());
-		}
 
 		/// <summary>
 		/// Gets whether the property has the access modifier 'protected'.
@@ -159,6 +169,17 @@ namespace Versioning
 				default:
 					throw new ArgumentException(nameof(accessAndStaticModifiers));
 			}
+		}
+
+		public static AccessAndStaticModifiers GetLeastAccessible(AccessAndStaticModifiers a, AccessAndStaticModifiers b)
+		{
+			if ((a & AccessAndStaticModifiers.Static) != (b & AccessAndStaticModifiers.Static))
+				return default;
+
+			return min(a & AccessAndStaticModifiers.AccessMask, b & AccessAndStaticModifiers.AccessMask);
+
+			static AccessAndStaticModifiers min(AccessAndStaticModifiers x, AccessAndStaticModifiers y)
+				=> (AccessAndStaticModifiers)Math.Min((int)x, (int)y);
 		}
 	}
 

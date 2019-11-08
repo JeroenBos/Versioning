@@ -28,7 +28,7 @@ namespace Versioning
 		/// Note that it not being null doesn't guarantee there is no possible binary compatibility issue; this is just
 		/// the element that would be resolved. </param>
 		/// <param name="candidates"> The assembly elements in the other assembly that almost matched. </param>
-		IEnumerable<ICompatibilityIssue> Evaluate(T element, T? resolvedElement, IReadOnlyList<T> candidates);
+		IEnumerable<ICompatibilityIssue> Evaluate(T element, T? resolvedElement, IReadOnlyList<IMemberDefinition> candidates);
 
 	}
 

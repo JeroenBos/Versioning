@@ -244,5 +244,17 @@ namespace Versioning.Tests
 			Assert.AreEqual("D", ((MissingMemberIssue)issues[0]).MissingMember.Name);
 		}
 
+		[Test]
+		public void MemberRemovalInInternalTypeIsNotReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
 	}
 }

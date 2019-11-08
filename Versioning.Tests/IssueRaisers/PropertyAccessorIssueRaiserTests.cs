@@ -207,6 +207,21 @@ namespace Versioning.Tests
 			Assert.AreEqual(1, issues.Count);
 			Assert.AreEqual(PropertyAccessor.Set, ((MissingAccessorIssue)issues[0]).Accessor);
 		}
+
+		[Test]
+		public void AccessorRemovalInInternalPropertyIsNotReported()
+		{
+			// arrange
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i { get; set; } } public class B { public int i { get; internal set; } } "));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i { get; } }      public class B { public int i { get; } }"));
+
+			// act
+			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
+
+			Assert.AreEqual(0, issues.Count);
+		}
+
+
 		// TODO: indexer overload testing
 
 	}

@@ -1,16 +1,2 @@
-Detected 10 potential compatibility issues
+Detected 0 potential compatibility issues
 between assembly NodaTime versions 2.0.0.0 and 2.4.7.0:
-
-The following members were not present in the newer assembly:
-- NodaTime.Fields.FixedLengthDatePeriodField::Subtract
-- NodaTime.Fields.IDatePeriodField::Subtract
-- NodaTime.Fields.MonthsPeriodField::Subtract
-- NodaTime.Fields.TimePeriodField::Subtract
-- NodaTime.Fields.TimePeriodField::UnitsPerDay
-- NodaTime.Fields.YearsPeriodField::Subtract
-- NodaTime.Properties.Messages
-- NodaTime.Properties.PatternResources
-- NodaTime.TimeZones.PrecalculatedDateTimeZone::IsCachable
-- NodaTime.TimeZones.PrecalculatedDateTimeZone::MaybeCreateCachedZone
-
-Done

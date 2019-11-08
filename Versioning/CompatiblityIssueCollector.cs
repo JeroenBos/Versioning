@@ -34,6 +34,7 @@ namespace Versioning
 			};
 			return new CompatiblityIssueCollector(issueRaisers);
 		}
+
 		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
 		/// <param name="raiseWhenParentIsMissing"> Indicates whether issues should be raised on assembly elements evenwhen the declaring/parent assembly element is missing. </param>
 		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers)

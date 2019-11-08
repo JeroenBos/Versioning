@@ -43,17 +43,17 @@ namespace Versioning.CLI
 
 			if (args.Length == 3)
 			{
-				ListIssues(assemblies[0], assemblies[1], assemblies[2]);
+				ListDetectedIssues(assemblies[0], assemblies[1], assemblies[2]);
 			}
 			else
 			{
-				ListDifferences(assemblies[0], assemblies[1]);
+				ListPotentialIssues(assemblies[0], assemblies[1]);
 			}
 
 			Console.ReadKey();
 		}
 
-		private static void ListIssues(AssemblyDefinition main, AssemblyDefinition dependency, AssemblyDefinition dependencyHigherVersion)
+		private static void ListDetectedIssues(AssemblyDefinition main, AssemblyDefinition dependency, AssemblyDefinition dependencyHigherVersion)
 		{
 			var issueCollector = CompatiblityIssueCollector.Default;
 			var detectedIssues = IssueDetector.DetectCompatibilityIssues(issueCollector, main, dependency, dependencyHigherVersion)
@@ -71,7 +71,7 @@ namespace Versioning.CLI
 			}
 		}
 
-		private static void ListDifferences(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion)
+		private static void ListPotentialIssues(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion)
 		{
 			if (assembly.Name.Name != assemblyHigherVersion.Name.Name)
 			{

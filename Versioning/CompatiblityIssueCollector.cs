@@ -217,10 +217,14 @@ namespace Versioning
 		/// Gets the issues raised by the issue raisers applicable on <paramref name="element"/>, 
 		/// given the resolved equivalent of the element in the other assembly, and candidates.
 		/// </summary>
-		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, T? equivalentElement, IReadOnlyList<T> candidates) where T : class
+		private IEnumerable<ICompatibilityIssue> GetIssuesOn<T>(T element, T? equivalentElement, IReadOnlyList<T> candidates) where T : class, IMemberDefinition
 		{
-			return this.GetIssueRaisers<T>()
-					   .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
+			var result = this.GetIssueRaisers<T>()
+							 .SelectMany(issueRaiser => issueRaiser.Evaluate(element, equivalentElement, candidates));
+
+			if (typeof(T) == typeof(IMemberDefinition))
+				return result;
+			return result.Concat(GetIssuesOn<IMemberDefinition>(element, equivalentElement, candidates));
 		}
 
 		/// <summary>

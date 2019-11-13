@@ -27,7 +27,7 @@ namespace Versioning
 		public static CompatiblityIssueCollector Default { get; } = createDefault();
 		private static CompatiblityIssueCollector createDefault()
 		{
-			var issueRaisers = new ICompatiblityIssueRaiser[]
+			var issueRaisers = new ICompatibilityIssueRaiser[]
 			{
 				new MissingMemberIssueRaiser(),
 				new MemberAccessibilityReducedIssueRaiser(),
@@ -35,9 +35,9 @@ namespace Versioning
 			return new CompatiblityIssueCollector(issueRaisers);
 		}
 
-		public IReadOnlyList<ICompatiblityIssueRaiser> IssueRaisers { get; }
+		public IReadOnlyList<ICompatibilityIssueRaiser> IssueRaisers { get; }
 		/// <param name="raiseWhenParentIsMissing"> Indicates whether issues should be raised on assembly elements evenwhen the declaring/parent assembly element is missing. </param>
-		public CompatiblityIssueCollector(IReadOnlyList<ICompatiblityIssueRaiser> issueRaisers)
+		public CompatiblityIssueCollector(IReadOnlyList<ICompatibilityIssueRaiser> issueRaisers)
 		{
 			if (issueRaisers == null)
 				throw new ArgumentNullException(nameof(issueRaisers));

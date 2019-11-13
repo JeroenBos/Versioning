@@ -108,7 +108,7 @@ namespace Versioning
 		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
 		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
 		/// </summary>
-		public static AssemblyLoadContext LoadAssemblyWithReferenceAgainstDifferenceVersion(
+		public static AssemblyLoadContext LoadAssemblyWithReferenceAgainstDifferentVersion(
 			string referencedAssemblySourceCode,
 			string referencedAssemblySourceCodev2,
 			string sourceCode,

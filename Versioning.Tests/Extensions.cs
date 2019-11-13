@@ -9,7 +9,7 @@ namespace Versioning.Tests
 	{
 		public static CompatiblityIssueCollector ToSingleton<T>(this ICompatibilityIssueRaiser<T> raiser) where T : class
 		{
-			return new CompatiblityIssueCollector(new ICompatiblityIssueRaiser[] { raiser });
+			return new CompatiblityIssueCollector(new ICompatibilityIssueRaiser[] { raiser });
 		}
 	}
 }

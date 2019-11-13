@@ -4,7 +4,7 @@ using Mono.Cecil;
 
 namespace Versioning
 {
-	public interface ICompatiblityIssueRaiser { }
+	public interface ICompatibilityIssueRaiser { }
 	/// <summary>
 	/// Represents a detector for a particular kind of compatibility issue for a particular kind 
 	/// of assembly element <typeparamref name="T"/> (class, struct, interface, method, property, etc).
@@ -18,7 +18,7 @@ namespace Versioning
 	/// - <see cref="PropertyDefinition"/>
 	/// - <see cref="EventDefinition"/>
 	/// </typeparam>
-	public interface ICompatibilityIssueRaiser<in T> : ICompatiblityIssueRaiser where T : class
+	public interface ICompatibilityIssueRaiser<in T> : ICompatibilityIssueRaiser where T : class
 	{
 		/// <summary>
 		/// Gets all issues on the specified element and its resolved counterparts in the other assembly.

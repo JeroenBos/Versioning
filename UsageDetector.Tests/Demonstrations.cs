@@ -11,16 +11,16 @@ namespace Versioning.UsageDetector.Tests
 		/// <summary>
 		/// Loads the main assembly built against the dependency v1, but runtime loads dependency v2, and returns the main assembly's entry point as action, if any.
 		/// </summary>
-		public static TestDelegate? LoadAssemblyWithReferenceAgainstDifferenceVersion(string sourceCode_DependencyV1, string sourceCode_DependencyV2, string sourceCode_Main)
+		public static TestDelegate? LoadAssemblyWithReferenceAgainstDifferentVersion(string sourceCode_DependencyV1, string sourceCode_DependencyV2, string sourceCode_Main)
 		{
-			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferenceVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main).Assemblies.ToList();
+			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main).Assemblies.ToList();
 
 			var mainAssembly = assemblies[1];
 			if (mainAssembly.EntryPoint == null)
 				return null;
 			return () => mainAssembly.EntryPoint.Invoke(null, new object?[] { null });
 		}
-
+		
 		[Test]
 		public void RunMain()
 		{
@@ -28,7 +28,7 @@ namespace Versioning.UsageDetector.Tests
 			const string sourceCode_DependencyV2 = @"";
 			const string sourceCode_Main = @"public class Program { public static void Main(string[] args) { } }";
 
-			TestDelegate entryPoint = LoadAssemblyWithReferenceAgainstDifferenceVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main)!;
+			TestDelegate entryPoint = LoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main)!;
 
 			entryPoint();
 		}

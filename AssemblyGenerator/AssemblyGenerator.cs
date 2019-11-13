@@ -54,10 +54,8 @@ namespace Versioning
 
 
 			// compile
-			var compilationOptions = new CSharpCompilationOptions(
-				OutputKind.DynamicallyLinkedLibrary,
-				optimizationLevel: optimizationLevel,
-				allowUnsafe: true);
+			var outputKind = sourceCode.Contains(" Main(") ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary;
+			var compilationOptions = new CSharpCompilationOptions(outputKind, optimizationLevel: optimizationLevel, allowUnsafe: true);
 			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions, references: defaultReferences)
 			  .AddReferences(references ?? Array.Empty<MetadataReference>())
 			  .AddSyntaxTrees(syntaxTree);
@@ -67,7 +65,7 @@ namespace Versioning
 			// emit
 			var stream = new MemoryStream();
 			var emitResult = compilation.Emit(stream);
-			var diagnostics = compilation.GetDeclarationDiagnostics();
+			var diagnostics = emitResult.Diagnostics;
 
 			if (emitResult.Success)
 			{

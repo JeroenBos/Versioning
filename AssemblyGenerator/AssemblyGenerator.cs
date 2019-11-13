@@ -4,6 +4,7 @@ using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
@@ -20,6 +21,14 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.CSharp8,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
+			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, optimizationLevel, languageVersion, references);
+		}
+		public static Stream CreateStream(string[] sourceCode,
+			string assemblyName = "defaultAssemblyName",
+			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
+			LanguageVersion languageVersion = LanguageVersion.CSharp8,
+			IReadOnlyCollection<MetadataReference>? references = null)
+		{
 			return CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion, references);
 		}
 
@@ -27,9 +36,17 @@ namespace Versioning
 		  MetadataReference.CreateFromFile(typeof(Binder).GetTypeInfo().Assembly.Location),
 		};
 
-
 		public static Stream CreateAssembly(
 			string sourceCode,
+			string assemblyName = "defaultAssemblyName",
+			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
+			LanguageVersion languageVersion = LanguageVersion.Default,
+			IReadOnlyCollection<MetadataReference>? references = null)
+		{
+			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, optimizationLevel, languageVersion, references);
+		}
+		public static Stream CreateAssembly(
+			string[] sourceCode,
 			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
 			LanguageVersion languageVersion = LanguageVersion.Default,
@@ -40,7 +57,7 @@ namespace Versioning
 
 
 		public static Stream CreateAssembly(
-			string sourceCode,
+			string[] sourceCode,
 			string assemblyName,
 			out MetadataReference reference,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
@@ -50,7 +67,7 @@ namespace Versioning
 		{
 			// parse
 			var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: languageVersion);
-			SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(sourceCode, parseOptions);
+			var syntaxTrees = sourceCode.Select(sourceCode => CSharpSyntaxTree.ParseText(sourceCode, parseOptions));
 
 
 			// compile
@@ -58,7 +75,7 @@ namespace Versioning
 			var compilationOptions = new CSharpCompilationOptions(outputKind, optimizationLevel: optimizationLevel, allowUnsafe: true);
 			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions, references: defaultReferences)
 			  .AddReferences(references ?? Array.Empty<MetadataReference>())
-			  .AddSyntaxTrees(syntaxTree);
+			  .AddSyntaxTrees(syntaxTrees);
 
 			reference = compilation.ToMetadataReference();
 
@@ -81,7 +98,7 @@ namespace Versioning
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
 			LanguageVersion languageVersion = LanguageVersion.Default)
 		{
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, optimizationLevel, languageVersion);
+			var assemblyStream = CreateAssembly(new[] { sourceCode }, assemblyName, optimizationLevel, languageVersion);
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 			context.LoadFromStream(assemblyStream);
 			return context;
@@ -96,8 +113,8 @@ namespace Versioning
 		{
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 
-			var referencedStream = CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, references: new[] { reference });
+			var referencedStream = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference);
+			var assemblyStream = CreateAssembly(new[] { sourceCode }, assemblyName, references: new[] { reference });
 
 			context.LoadFromStream(referencedStream);
 			context.LoadFromStream(assemblyStream);
@@ -133,13 +150,13 @@ namespace Versioning
 		{
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 
-			referencedAssemblySourceCodev2 = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]" + referencedAssemblySourceCodev2;
+			const string v2Attribute = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]";
 
-			var dependencyV1 = CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
-			var dependencyV2 = CreateAssembly(referencedAssemblySourceCodev2, referencedAssemblyName);
-			var main = CreateAssembly(sourceCode, assemblyName, references: new[] { reference });
+			var dependencyV1 = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference);
+			var dependencyV2 = CreateAssembly(new[] { referencedAssemblySourceCodev2, v2Attribute }, referencedAssemblyName);
+			var main = CreateAssembly(new[] { sourceCode }, assemblyName, references: new[] { reference });
 
-			context.LoadFromStream(dependencyV2); 
+			context.LoadFromStream(dependencyV2);
 			context.LoadFromStream(main);
 			dependencyV2.Position = 0;
 			main.Position = 0;

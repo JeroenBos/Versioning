@@ -1,10 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Runtime.Loader;
 
 namespace Versioning
@@ -104,6 +104,7 @@ namespace Versioning
 			return context;
 		}
 
+
 		/// <summary>
 		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
 		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
@@ -115,16 +116,35 @@ namespace Versioning
 			string referencedAssemblyName = "defaultReferencedAssemblyName",
 			string assemblyName = "defaultAssemblyName")
 		{
+			return LoadAssemblyWithReferenceAgainstDifferentVersion(referencedAssemblySourceCode, referencedAssemblySourceCodev2, sourceCode, out var _, referencedAssemblyName, assemblyName);
+		}
+
+		/// <summary>
+		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
+		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
+		/// </summary>
+		public static AssemblyLoadContext LoadAssemblyWithReferenceAgainstDifferentVersion(
+			string referencedAssemblySourceCode,
+			string referencedAssemblySourceCodev2,
+			string sourceCode,
+			out (AssemblyDefinition dependencyV1, AssemblyDefinition dependencyV2, AssemblyDefinition main) assemblyDefinitions,
+			string referencedAssemblyName = "defaultReferencedAssemblyName",
+			string assemblyName = "defaultAssemblyName")
+		{
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 
 			referencedAssemblySourceCodev2 = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]" + referencedAssemblySourceCodev2;
 
-			CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
-			var referencedAssemblyRuntime = CreateAssembly(referencedAssemblySourceCodev2, referencedAssemblyName);
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, references: new[] { reference });
+			var dependencyV1 = CreateAssembly(referencedAssemblySourceCode, referencedAssemblyName, out MetadataReference reference);
+			var dependencyV2 = CreateAssembly(referencedAssemblySourceCodev2, referencedAssemblyName);
+			var main = CreateAssembly(sourceCode, assemblyName, references: new[] { reference });
 
-			context.LoadFromStream(referencedAssemblyRuntime);
-			context.LoadFromStream(assemblyStream);
+			context.LoadFromStream(dependencyV2); 
+			context.LoadFromStream(main);
+			dependencyV2.Position = 0;
+			main.Position = 0;
+
+			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyV1), AssemblyDefinition.ReadAssembly(dependencyV2), AssemblyDefinition.ReadAssembly(main));
 			return context;
 		}
 	}

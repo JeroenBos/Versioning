@@ -103,8 +103,9 @@ namespace Versioning.UsageDetector
 			AssemblyDefinition dependency,
 			AssemblyDefinition dependencyHigherVersion)
 		{
-			var usage = GetAllTypeAndMemberReferences(main).Where(reference => reference.RefersIn(dependency))
-														   .ToList();
+			var allReferences = GetAllTypeAndMemberReferences(main);
+			var usage = allReferences.Where(reference => reference.RefersIn(dependency))
+									 .ToList();
 
 			var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
 								  .ToList();
@@ -120,7 +121,7 @@ namespace Versioning.UsageDetector
 		{
 			var type = reference as TypeReference ?? reference.DeclaringType;
 
-			return dependency.Equals(type.Module.Assembly);
+			return dependency.FullName == (type.Scope as AssemblyNameReference)?.FullName;
 		}
 
 		/// <summary>

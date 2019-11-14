@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Versioning
 {
+	public delegate Task<(int ExitCode, string Output, string ErrorOutput)> ProcessDelegate();
 	public static class ProcessExtensions
 	{
 		/// <summary>
@@ -60,7 +61,7 @@ namespace Versioning
 				info.CreateNoWindow = true;
 				info.WindowStyle = ProcessWindowStyle.Hidden;
 			}
-			return info.StartIndependentlyAsync();
+			return info.WaitForExitAsync();
 		}
 
 		/// <summary>
@@ -68,9 +69,38 @@ namespace Versioning
 		/// This method starts a process without ths relaton with the calling process, so that new process can outlive it.
 		/// </summary>
 		/// <returns>A Task representing waiting for the process to end.</returns>
-		public static Task<int> StartIndependentlyAsync(this ProcessStartInfo startInfo)
+		public static Task<int> WaitForExitAsync(this ProcessStartInfo startInfo)
 		{
 			return Process.Start(startInfo).WaitForExitAsync();
+		}
+
+		public static async Task<(int ExitCode, string StandardOutput, string ErrorOutput)> WaitForExitAndReadOutputAsync(this ProcessStartInfo startInfo)
+		{
+			var process = Process.Start(startInfo.WithOutput());
+			var result = await process.WaitForExitAsync();
+
+			string output = process.StandardOutput.ReadToEnd();
+			string errorOutput = process.StandardError.ReadToEnd();
+			return (result, output, errorOutput);
+		}
+		public static Task<int> StartInvisiblyAsync(this ProcessStartInfo startInfo)
+		{
+			return startInfo.WithHidden().WaitForExitAsync();
+		}
+
+		public static ProcessStartInfo WithHidden(this ProcessStartInfo startInfo)
+		{
+			startInfo.CreateNoWindow = true;
+			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			return startInfo;
+		}
+
+		public static ProcessStartInfo WithOutput(this ProcessStartInfo startInfo)
+		{
+			startInfo.UseShellExecute = false;
+			startInfo.RedirectStandardOutput = true;
+			startInfo.RedirectStandardError = true;
+			return startInfo;
 		}
 	}
 }

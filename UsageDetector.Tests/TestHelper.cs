@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Versioning.UsageDetector.Tests
 {
@@ -12,33 +13,20 @@ namespace Versioning.UsageDetector.Tests
 	{
 		public static string PackagesDirectory => Path.GetFullPath("../../../Packages");
 
-		public static PortableExecutableReference mscorlibReference => CreateReferenceToTrustedAssembly("mscorlib");
-		public static PortableExecutableReference[] framework => Framework("C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.7.2/");
-		public static PortableExecutableReference[] Framework(string path)
+		public static PortableExecutableReference[] Framework4_7_2 => Framework("C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.7.2/");
+		internal static PortableExecutableReference[] Framework(string path)
 		{
 			var assemblies = new[] { "mscorlib", "System", "System.Core", "Facades/netstandard", "Facades/System.Runtime" }
-				.Select(n => Path.Combine(path, n + ".dll"))
-				.Where(path => File.Exists(path))
+				.Select(name => Path.Combine(path, name + ".dll"))
 				.Select(path => MetadataReference.CreateFromFile(path))
 				.ToArray();
 			return assemblies;
 		}
-		public static PortableExecutableReference CreateReferenceToTrustedAssembly(string assemblyName)
-		{
-			var trustedAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(Path.PathSeparator);
-			var result = trustedAssembliesPaths
-				.Where(p => assemblyName == Path.GetFileNameWithoutExtension(p))
-				.Select(p => MetadataReference.CreateFromFile(p))
-				.FirstOrDefault();
-			if (result == null)
-				throw new Exception($"Couldn't find assembly '{assemblyName}'");
-			return result;
-		}
 
-		public static (AsyncTestDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static (ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
 			PortableExecutableReference dependencyReference,
 			string runtimeDependencyPath,
-			string sourceCode_Main,
+			string[] sourceCode_Main,
 			CompatiblityIssueCollector? issueRaiser = null,
 			params PortableExecutableReference[] otherDependencies)
 		{
@@ -47,7 +35,7 @@ namespace Versioning.UsageDetector.Tests
 			var (dependencyV1, dependencyV2, main) = assemblyDefinitions;
 			var issues = UsageDetector.DetectCompatibilityIssues(issueRaiser ?? CompatiblityIssueCollector.Default, main, dependencyV1, dependencyV2).ToList();
 
-			return (() => entryPoint(), issues);
+			return (entryPoint, issues);
 		}
 
 		/// <summary>
@@ -55,14 +43,14 @@ namespace Versioning.UsageDetector.Tests
 		/// Also returns raised issues.
 		/// </summary>
 		/// <param name="issueRaiser"> Specify null to use the default issue collector. </param>
-		public static (AsyncTestDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static (ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
 			string sourceCode_DependencyV1,
 			string sourceCode_DependencyV2,
 			string sourceCode_Main,
-			CompatiblityIssueCollector? issueRaiser = null)
+			CompatiblityIssueCollector? issueRaiser = null,
+			params PortableExecutableReference[] otherDependencies)
 		{
-			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main, out var assemblyDefinitions).Assemblies.ToList();
-			AsyncTestDelegate? entryPoint = assemblies[1].WrapEntryPoint();
+			ProcessDelegate? entryPoint = AssemblyGenerator.CreateAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main, out var assemblyDefinitions, otherReferences: otherDependencies);
 
 			var (dependencyV1, dependencyV2, main) = assemblyDefinitions;
 			var issues = UsageDetector.DetectCompatibilityIssues(issueRaiser ?? CompatiblityIssueCollector.Default, main, dependencyV1, dependencyV2).ToList();

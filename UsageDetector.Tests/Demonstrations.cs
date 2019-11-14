@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Versioning.UsageDetector.Tests
 {
@@ -13,46 +14,51 @@ namespace Versioning.UsageDetector.Tests
 	class Demonstrations : TestHelper
 	{
 		[Test]
-		public void RunMain()
+		public async Task RunMain()
 		{
 			const string sourceCode_DependencyV1 = @"";
 			const string sourceCode_DependencyV2 = @"";
 			const string sourceCode_Main = @"class P { static void Main(string[] args) { } }";
 
-			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main);
+			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main, otherDependencies: Framework4_7_2);
 
 			Assert.AreEqual(0, detectedIssues.Count);
-			Assert.DoesNotThrowAsync(entryPoint);
+			var (exitCode, _, _) = await entryPoint!();
+			Assert.AreEqual(0, exitCode);
 		}
 
 
 		[Test]
-		public void Nodatime_IClock_Now()
+		public async Task Nodatime_IClock_Now()
 		{
 			const string sourceCode_Main = @"
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using NodaTime; 
 
-public class C 
+class C 
 {
-	public static void Main(string[] args)
+	static void Main(string[] args)
 	{
-		Trace.WriteLine(""In dependency"");
-		throw new System.Exception(""Hi"");
+		var i = SystemClock.Instance.Now;
 	}
 }";
+
 			string nodatime1_4_7Path_3_5 = Path.Combine(PackagesDirectory, "NodaTime.1.4.7", "lib", "net35-Client", "NodaTime.dll");
-			string nodatime2_4_7Path = Path.Combine(PackagesDirectory, "NodaTime.2.4.7", "lib", "netstandard2.0", "NodaTime.dll");
+			string nodatime2_4_7Path = Path.Combine(PackagesDirectory, "NodaTime.2.4.7", "lib", "net45", "NodaTime.dll");
 
 			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
 				dependencyReference: MetadataReference.CreateFromFile(nodatime1_4_7Path_3_5),
 				runtimeDependencyPath: nodatime2_4_7Path,
-				sourceCode_Main: sourceCode_Main,
-				otherDependencies: framework
+				sourceCode_Main: new[] { sourceCode_Main },
+				otherDependencies: Framework4_7_2
 			);
 			Assert.AreEqual(0, detectedIssues.Count);
-			Assert.DoesNotThrowAsync(entryPoint);
+			var (_, _, errorOutput) = await entryPoint!();
+			Assert.IsTrue(errorOutput.Contains("System.IO.FileLoadException: Could not load file or assembly 'NodaTime, Version=1.4"));
+			Assert.IsTrue(errorOutput.Contains("The located assembly's manifest definition does not match the assembly reference."));
 		}
 	}
 }

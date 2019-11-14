@@ -24,7 +24,7 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
-			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, optimizationLevel, languageVersion, references);
+			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
 		}
 		public static Stream CreateStream(string[] sourceCode,
 			string assemblyName = "defaultAssemblyName",
@@ -32,7 +32,7 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
-			return CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion, references);
+			return CreateAssembly(sourceCode, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
 		}
 
 		private static readonly IReadOnlyCollection<MetadataReference> defaultReferences = new[] {
@@ -46,7 +46,7 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
-			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, optimizationLevel, languageVersion, references);
+			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
 		}
 		public static Stream CreateAssembly(
 			string[] sourceCode,
@@ -55,7 +55,7 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
-			return CreateAssembly(sourceCode, assemblyName, out var _, optimizationLevel, languageVersion, references);
+			return CreateAssembly(sourceCode, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
 		}
 
 		public static bool HasEntryPoint(SyntaxTree sourceCode)
@@ -66,6 +66,7 @@ namespace Versioning
 			string[] sourceCode,
 			string assemblyName,
 			out MetadataReference reference,
+			out OutputKind outputKind,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
 			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
 			IReadOnlyCollection<MetadataReference>? references = null)
@@ -77,7 +78,7 @@ namespace Versioning
 
 
 			// compile
-			var outputKind = syntaxTrees.Any(HasEntryPoint) ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary;
+			outputKind = syntaxTrees.Any(HasEntryPoint) ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary;
 			var compilationOptions = new CSharpCompilationOptions(outputKind, optimizationLevel: optimizationLevel, allowUnsafe: true);
 			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions)
 			  .AddReferences(references ?? defaultReferences)
@@ -95,7 +96,7 @@ namespace Versioning
 				stream.Seek(0, SeekOrigin.Begin);
 				return stream;
 			}
-			throw new SystemException("Emitting failed");
+			throw new Exception("Emitting failed");
 		}
 
 		public static AssemblyLoadContext Load(
@@ -119,7 +120,7 @@ namespace Versioning
 		{
 			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
 
-			var referencedStream = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference);
+			var referencedStream = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference, out var _);
 			var assemblyStream = CreateAssembly(new[] { sourceCode }, assemblyName, references: new[] { reference });
 
 			context.LoadFromStream(referencedStream);
@@ -132,43 +133,42 @@ namespace Versioning
 		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
 		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
 		/// </summary>
-		public static AssemblyLoadContext LoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static ProcessDelegate? CreateAssemblyWithReferenceAgainstDifferentVersion(
 			string referencedAssemblySourceCode,
 			string referencedAssemblySourceCodev2,
 			string sourceCode,
 			string referencedAssemblyName = "defaultReferencedAssemblyName",
-			string assemblyName = "defaultAssemblyName")
+			string assemblyName = "defaultAssemblyName",
+			IReadOnlyList<PortableExecutableReference>? otherReferences = null)
 		{
-			return LoadAssemblyWithReferenceAgainstDifferentVersion(referencedAssemblySourceCode, referencedAssemblySourceCodev2, sourceCode, out var _, referencedAssemblyName, assemblyName);
+			return CreateAssemblyWithReferenceAgainstDifferentVersion(referencedAssemblySourceCode, referencedAssemblySourceCodev2, sourceCode, out var _, referencedAssemblyName, assemblyName, otherReferences: otherReferences);
 		}
 
 		/// <summary>
 		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
 		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
 		/// </summary>
-		public static AssemblyLoadContext LoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static ProcessDelegate? CreateAssemblyWithReferenceAgainstDifferentVersion(
 			string referencedAssemblySourceCode,
 			string referencedAssemblySourceCodev2,
 			string sourceCode,
 			out (AssemblyDefinition dependencyV1, AssemblyDefinition dependencyV2, AssemblyDefinition main) assemblyDefinitions,
 			string referencedAssemblyName = "defaultReferencedAssemblyName",
-			string assemblyName = "defaultAssemblyName")
+			string assemblyName = "defaultAssemblyName",
+			IReadOnlyList<PortableExecutableReference>? otherReferences = null)
 		{
-			AssemblyLoadContext context = new TemporaryAssemblyLoadContext();
-
 			const string v2Attribute = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]";
 
-			var dependencyV1 = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference);
+			var dependencyV1 = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference, out var _);
 			var dependencyV2 = CreateAssembly(new[] { referencedAssemblySourceCodev2, v2Attribute }, referencedAssemblyName);
-			var main = CreateAssembly(new[] { sourceCode }, assemblyName, references: new[] { reference });
-
-			context.LoadFromStream(dependencyV2);
-			context.LoadFromStream(main);
-			dependencyV2.Position = 0;
-			main.Position = 0;
+			var main = CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var outputKind, references: otherReferences.Concat(new [] { reference }).ToList());
 
 			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyV1), AssemblyDefinition.ReadAssembly(dependencyV2), AssemblyDefinition.ReadAssembly(main));
-			return context;
+
+			return CopyToTempDirectory((assemblyName, main), 
+				                       outputKind,
+				                       Array.Empty<string>(), 
+				                       (referencedAssemblyName, dependencyV2));
 		}
 
 
@@ -176,10 +176,10 @@ namespace Versioning
 		/// Compiles the source code against an assembly containing <paramref name="referencedAssemblySourceCode"/>,
 		/// but loads the assembly containing <paramref name="referencedAssemblySourceCodev2"/>.
 		/// </summary>
-		public static Func<Task> LoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static ProcessDelegate? LoadAssemblyWithReferenceAgainstDifferentVersion(
 			PortableExecutableReference dependencyReference,
 			string dependencyToBeLoadedPath,
-			string sourceCode,
+			string[] sourceCode,
 			out (AssemblyDefinition dependencyV1, AssemblyDefinition dependencyV2, AssemblyDefinition main) assemblyDefinitions,
 			IReadOnlyList<PortableExecutableReference>? otherReferences = null,
 			string assemblyName = "defaultAssemblyName")
@@ -187,26 +187,56 @@ namespace Versioning
 			otherReferences ??= Array.Empty<PortableExecutableReference>();
 
 			var references = otherReferences.Concat(new[] { dependencyReference }).ToList();
-			var main = CreateAssembly(sourceCode, assemblyName, references: references);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, out var outputKind, references: references);
 
+			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyReference.FilePath), AssemblyDefinition.ReadAssembly(dependencyToBeLoadedPath), AssemblyDefinition.ReadAssembly(assemblyStream));
+
+			return CopyToTempDirectory((assemblyName, assemblyStream),
+									   outputKind,
+									   otherReferences.Select(r => r.FilePath).Concat(new[] { dependencyToBeLoadedPath }));
+		}
+
+		private static ProcessDelegate? CopyToTempDirectory(NamedAssemblyStream mainAssembly, OutputKind outputKind, IEnumerable<string> dependenciesPaths, NamedAssemblyStream dependency = default)
+		{
 			var tempDirPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), Guid.NewGuid().ToString());
 			Trace.WriteLine("Temp dir: " + tempDirPath);
 			var dir = Directory.CreateDirectory(tempDirPath);
-			var mainAssemblyPath = Path.Combine(dir.FullName, assemblyName + ".dll");
-			using (var fileStream = File.Create(mainAssemblyPath))
+			var mainAssemblyPath = Path.Combine(dir.FullName, mainAssembly.Name + (outputKind == OutputKind.ConsoleApplication ? ".exe" : ".dll"));
+
+			WriteAllTo(mainAssembly.Stream, mainAssemblyPath);
+			if (dependency.Stream != null)
 			{
-				main.CopyTo(fileStream);
-				main.Seek(0, SeekOrigin.Begin);
+				WriteAllTo(dependency.Stream, Path.Combine(dir.FullName, dependency.Name + ".dll"));
 			}
 
-			foreach (string dependencyPath in otherReferences.Select(r => r.FilePath).Concat(new[] { dependencyToBeLoadedPath }))
+			foreach (string dependencyPath in dependenciesPaths)
 			{
-				File.Copy(dependencyPath, dir.FullName + Path.GetFileName(dependencyPath));
+				File.Copy(dependencyPath, Path.Combine(dir.FullName, Path.GetFileName(dependencyPath)));
 			}
 
-			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyReference.FilePath), AssemblyDefinition.ReadAssembly(dependencyToBeLoadedPath), AssemblyDefinition.ReadAssembly(main));
 
-			return () => Process.Start(mainAssemblyPath).WaitForExitAsync();
+			if (outputKind == OutputKind.ConsoleApplication)
+				return () => new ProcessStartInfo(mainAssemblyPath).WaitForExitAndReadOutputAsync();
+			return null;
+
+			static void WriteAllTo(Stream stream, string path)
+			{
+				stream.Seek(0, SeekOrigin.Begin);
+				using var fileStream = File.Create(path);
+				stream.CopyTo(fileStream);
+				stream.Seek(0, SeekOrigin.Begin);
+			}
 		}
+	}
+}
+
+readonly struct NamedAssemblyStream
+{
+	public string Name { get; }
+	public Stream Stream { get; }
+	public NamedAssemblyStream(string name, Stream stream) => (Name, Stream) = (name, stream);
+	public static implicit operator NamedAssemblyStream((string, Stream) tuple)
+	{
+		return new NamedAssemblyStream(tuple.Item1, tuple.Item2);
 	}
 }

@@ -1,50 +1,17 @@
-﻿using Mono.Cecil;
+﻿using Microsoft.CodeAnalysis;
+using Mono.Cecil;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace Versioning.UsageDetector.Tests
 {
 	// This class provides examples of runtime binding exceptions being thrown whenever an issues is raised
-	class Demonstrations
+	class Demonstrations : TestHelper
 	{
-		/// <summary>
-		/// Loads the main assembly built against the dependency v1, but runtime loads dependency v2, and returns the main assembly's entry point as action, if any.
-		/// </summary>
-		public static TestDelegate? LoadAssemblyWithReferenceAgainstDifferentVersion(
-			string sourceCode_DependencyV1,
-			string sourceCode_DependencyV2,
-			string sourceCode_Main,
-			out (AssemblyDefinition dependencyV1, AssemblyDefinition dependencyV2, AssemblyDefinition main) assemblyDefinitions)
-		{
-			var assemblies = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main, out assemblyDefinitions).Assemblies.ToList();
-
-			var mainAssembly = assemblies[1];
-			if (mainAssembly.EntryPoint == null)
-				return null;
-			return () => mainAssembly.EntryPoint.Invoke(null, new object?[] { null });
-		}
-
-		/// <summary>
-		/// Loads the main assembly built against the dependency v1, but runtime loads dependency v2, and returns the main assembly's entry point as action, if any.
-		/// Also returns raised issues.
-		/// </summary>
-		/// <param name="issueRaiser"> Specify null to use the default issue collector. </param>
-		public static (TestDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
-			string sourceCode_DependencyV1,
-			string sourceCode_DependencyV2,
-			string sourceCode_Main,
-			CompatiblityIssueCollector? issueRaiser = null)
-		{
-			TestDelegate? entryPoint = LoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main, out var assemblyDefinitions);
-			var (dependencyV1, dependencyV2, main) = assemblyDefinitions;
-
-			var issues = UsageDetector.DetectCompatibilityIssues(issueRaiser ?? CompatiblityIssueCollector.Default, main, dependencyV1, dependencyV2).ToList();
-
-			return (entryPoint, issues);
-		}
-
 		[Test]
 		public void RunMain()
 		{
@@ -55,7 +22,37 @@ namespace Versioning.UsageDetector.Tests
 			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main);
 
 			Assert.AreEqual(0, detectedIssues.Count);
-			Assert.DoesNotThrow(entryPoint);
+			Assert.DoesNotThrowAsync(entryPoint);
+		}
+
+
+		[Test]
+		public void Nodatime_IClock_Now()
+		{
+			const string sourceCode_Main = @"
+using System;
+using System.Diagnostics;
+using NodaTime; 
+
+public class C 
+{
+	public static void Main(string[] args)
+	{
+		Trace.WriteLine(""In dependency"");
+		throw new System.Exception(""Hi"");
+	}
+}";
+			string nodatime1_4_7Path_3_5 = Path.Combine(PackagesDirectory, "NodaTime.1.4.7", "lib", "net35-Client", "NodaTime.dll");
+			string nodatime2_4_7Path = Path.Combine(PackagesDirectory, "NodaTime.2.4.7", "lib", "netstandard2.0", "NodaTime.dll");
+
+			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+				dependencyReference: MetadataReference.CreateFromFile(nodatime1_4_7Path_3_5),
+				runtimeDependencyPath: nodatime2_4_7Path,
+				sourceCode_Main: sourceCode_Main,
+				otherDependencies: framework
+			);
+			Assert.AreEqual(0, detectedIssues.Count);
+			Assert.DoesNotThrowAsync(entryPoint);
 		}
 	}
 }

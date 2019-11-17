@@ -21,7 +21,7 @@ namespace Versioning
 		public static Stream CreateStream(string sourceCode,
 			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
+			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
 			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
@@ -29,7 +29,7 @@ namespace Versioning
 		public static Stream CreateStream(string[] sourceCode,
 			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
+			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
 			return CreateAssembly(sourceCode, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
@@ -43,7 +43,7 @@ namespace Versioning
 			string sourceCode,
 			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
+			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
 			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
@@ -52,7 +52,7 @@ namespace Versioning
 			string[] sourceCode,
 			string assemblyName = "defaultAssemblyName",
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
+			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
 			return CreateAssembly(sourceCode, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
@@ -68,7 +68,7 @@ namespace Versioning
 			out MetadataReference reference,
 			out OutputKind outputKind,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.CSharp7_3,
+			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 
 		{

@@ -40,7 +40,7 @@ namespace Versioning.UsageDetector
 			if (obj == null)
 				return Enumerable.Empty<object>();
 
-			var allObjects = new HashSet<object>(new ReferencEqualityComparer());
+			var allObjects = new HashSet<object>(new ReferenceEqualityComparer());
 			impl(obj, allObjects);
 			return allObjects;
 

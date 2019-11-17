@@ -15,21 +15,6 @@ namespace Versioning.UsageDetector.Tests
 	class Demonstrations : TestHelper
 	{
 		[Test]
-		public async Task RunMain()
-		{
-			const string sourceCode_DependencyV1 = @"";
-			const string sourceCode_DependencyV2 = @"";
-			const string sourceCode_Main = @"class P { static void Main(string[] args) { } }";
-
-			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(sourceCode_DependencyV1, sourceCode_DependencyV2, sourceCode_Main, otherDependencies: Framework4_7_2);
-
-			Assert.AreEqual(0, detectedIssues.Count);
-			var (exitCode, _, _) = await entryPoint!();
-			Assert.AreEqual(0, exitCode);
-		}
-
-
-		[Test]
 		public async Task Nodatime_IClock_Now()
 		{
 			const string sourceCode_Main = @"

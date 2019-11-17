@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TargetDotNetFrameworkVersion = Microsoft.Build.Utilities.TargetDotNetFrameworkVersion;
 using ToolLocationHelper = Microsoft.Build.Utilities.ToolLocationHelper;
+using Versioning.CLI;
 
 
 namespace Versioning.UsageDetector.Tests
@@ -39,8 +41,25 @@ namespace Versioning.UsageDetector.Tests
 				return Path.GetFullPath(path);
 			}
 		}
+		/// <summary>
+		/// Gets the path to the CLI/Results directory to store test results.
+		/// </summary>
+		public static string TestResultsPath
+		{
+			get => Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "CLI", "Results"));
+		}
+
 		public static string NodaTime_1_4_7Path_3_5 => Path.Combine(PackagesDirectory, "NodaTime", "1.4.7", "lib", "net35-Client", "NodaTime.dll");
 		public static string NodaTime_2_4_7Path_4_5 => Path.Combine(PackagesDirectory, "NodaTime", "2.4.7", "lib", "net45", "NodaTime.dll");
+		public static NamedMetadataReference NodaTime_1_4_7Reference_3_5
+		{
+			get => (MetadataReference.CreateFromFile(NodaTime_1_4_7Path_3_5), new AssemblyNameReference("NodaTime", new Version(1, 4, 7)));
+		}
+		public static NamedMetadataReference NodaTime_2_4_7Reference_4_5
+		{
+			get => (MetadataReference.CreateFromFile(NodaTime_2_4_7Path_4_5), new AssemblyNameReference("NodaTime", new Version(2, 4, 7)));
+		}
+
 
 		public static string PathToNETFrameworkOver4_5
 		{
@@ -130,6 +149,23 @@ namespace Versioning.UsageDetector.Tests
 			var issues = UsageDetector.DetectCompatibilityIssues(issueRaiser ?? CompatiblityIssueCollector.Default, main, dependencyV1, dependencyV2).ToList();
 
 			return (entryPoint, issues);
+		}
+
+		public static void CreateReport(
+			IReadOnlyList<IDetectedCompatibilityIssue> detectedIssues,
+			AssemblyNameReference dependencyName,
+			AssemblyNameReference dependencyHigherVersionName,
+			AssemblyNameReference? assemblyName = null,
+			[CallerMemberName] string fileName = "")
+		{
+			assemblyName ??= new AssemblyNameReference("defaultAssemblyName", new Version(2, 0, 0));
+
+			try // reporting isn't crucial for the test itself, hence the try-catch
+			{
+				using var file = File.Open(Path.Combine(TestResultsPath, fileName + ".txt"), FileMode.Create);
+				detectedIssues.WriteTo(new StreamWriter(file) { AutoFlush = true }, assemblyName, dependencyName, dependencyHigherVersionName);
+			}
+			catch { }
 		}
 	}
 }

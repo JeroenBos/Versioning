@@ -12,29 +12,21 @@ namespace Versioning.UsageDetector
 {
 	public static class UsageDetector
 	{
-		public static IEnumerable<MemberReference> GetAllMemberReferences(AssemblyDefinition assembly)
+		/// <summary>
+		/// Gets all <see cref="MemberReference"/>s in the specified assembly. 
+		/// </summary>
+		public static IEnumerable<MemberReference> GetAllReferences(AssemblyDefinition assembly)
 		{
-			 return AllReferenceTypeObjectsIn(assembly)
-			 		.OfType<MemberReference>()
-			 		.Where(m => !(m is TypeReference));
-		}
+			// the current implementation is an abominable hack, but, in the interest of completeness, 
+			// this seems easier and safer than for me to manually list all places in an assembly where member references can occur.
 
-		public static IEnumerable<TypeReference> GetAllTypeReferences(AssemblyDefinition assembly)
-		{
-			// I don't know of a way to list all reference types using Mono.Cecil, so I just retrieve them using reflection. 
-			// The alternative is exhaustive list all locations in an assembly where type declarations may exist, but let's not go down that path
-
-			return AllReferenceTypeObjectsIn(assembly)
-				.OfType<TypeReference>();
-		}
-
-
-		public static IEnumerable<MemberReference> GetAllTypeAndMemberReferences(AssemblyDefinition assembly)
-		{
 			return AllReferenceTypeObjectsIn(assembly)
 				.OfType<MemberReference>();
 		}
 
+		/// <summary>
+		/// Gets all references in the .NET object hierarchy of the specified object.
+		/// </summary>
 		static IEnumerable<object> AllReferenceTypeObjectsIn(object obj)
 		{
 			if (obj == null)
@@ -68,10 +60,14 @@ namespace Versioning.UsageDetector
 				{
 					try
 					{
-						// just trigger getters so that backing fields are initialized
+						// just trigger getters so that backing fields are initialized.
 						property.GetValue(obj, Array.Empty<object>());
 					}
-					catch { }
+					catch
+					{
+						// amazingly, I have never observed an exception for the sample assemblies,
+						// but let's just leave the catch block just in case
+					}
 				}
 
 				var allFieldValues = obj.GetType()
@@ -92,10 +88,10 @@ namespace Versioning.UsageDetector
 		static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
 		/// <summary>
-		/// Ok, set out to solve the real problem:
-		/// Detect all type and member references to a particular assembly.
-		/// Detect all differences between two versions of that assembly.
-		/// Find the intersection.
+		/// This is the entry point for solving the original problem: 
+		/// - Detect all type and member references to a particular assembly.
+		/// - Detect all differences between two versions of that assembly.
+		/// - Find the intersection.
 		/// </summary>
 		public static IEnumerable<DetectedCompatibilityIssue> DetectCompatibilityIssues(
 			CompatiblityIssueCollector collector,
@@ -103,7 +99,7 @@ namespace Versioning.UsageDetector
 			AssemblyDefinition dependency,
 			AssemblyDefinition dependencyHigherVersion)
 		{
-			var allReferences = GetAllTypeAndMemberReferences(main);
+			var allReferences = GetAllReferences(main);
 			var usage = allReferences.Where(reference => reference.RefersIn(dependency))
 									 .ToList();
 

@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Versioning.UsageDetector
 {
+	/// <summary>
+	/// <see cref="Mono.Cecil.IMemberDefinition"/> and <see cref="Mono.Cecil.MemberReference"/> do not implement equality comparison,
+	/// so we do that here.
+	/// </summary>
 	class MemberEqualityComparer : IEqualityComparer<MemberReference>
 	{
 		public static readonly IEqualityComparer<MemberReference> Instance = new MemberEqualityComparer();

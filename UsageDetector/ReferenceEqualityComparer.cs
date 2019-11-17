@@ -2,6 +2,9 @@
 
 namespace Versioning.UsageDetector
 {
+	/// <summary>
+	/// Compares objects for equality by reference.
+	/// </summary>
 	class ReferenceEqualityComparer : IEqualityComparer<object>
 	{
 		bool IEqualityComparer<object>.Equals(object x, object y) => ReferenceEquals(x, y);

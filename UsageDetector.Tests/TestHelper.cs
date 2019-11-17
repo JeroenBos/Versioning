@@ -116,7 +116,7 @@ namespace Versioning.UsageDetector.Tests
 		/// <param name="issueRaiser"> The compatibility issue detector. Specify null to use the default. </param>
 		/// <param name="otherDependencies"> Other references that the source code depends upon, like .NET framework.
 		/// Specify nothing to reference the current .NET Core version. </param>
-		public static EntryPointPlusIssues DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static EntryPointPlusIssues DetectIssuesAndPrepareWithReferenceAgainstDifferentVersion(
 			PortableExecutableReference compileTimeDependency,
 			PortableExecutableReference runtimeDependency,
 			string[] sourceCode_Main,
@@ -136,7 +136,7 @@ namespace Versioning.UsageDetector.Tests
 		/// Also returns raised issues.
 		/// </summary>
 		/// <param name="issueRaiser"> Specify null to use the default issue collector. </param>
-		public static EntryPointPlusIssues DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static EntryPointPlusIssues DetectIssuesAndPrepareWithReferenceAgainstDifferentVersion(
 			string sourceCode_DependencyV1,
 			string sourceCode_DependencyV2,
 			string sourceCode_Main,

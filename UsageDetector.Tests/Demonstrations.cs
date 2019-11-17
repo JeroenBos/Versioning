@@ -35,7 +35,7 @@ class C
 }";
 
 			// act
-			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+			var (entryPoint, detectedIssues) = DetectIssuesAndPrepareWithReferenceAgainstDifferentVersion(
 				compileTimeDependency: MetadataReference.CreateFromFile(NodaTime_1_4_7Path_3_5),
 				runtimeDependency: MetadataReference.CreateFromFile(NodaTime_2_4_7Path_4_5),
 				sourceCode_Main: new[] { sourceCode_Main },

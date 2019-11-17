@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Versioning.UsageDetector;
 using IssueDetector = Versioning.UsageDetector.UsageDetector;
 
 namespace Versioning.CLI
 {
-	class Program
+	public static class Program
 	{
 		static void Main(string[] args)
 		{
@@ -61,7 +62,33 @@ namespace Versioning.CLI
 			var detectedIssues = IssueDetector.DetectCompatibilityIssues(issueCollector, main, dependency, dependencyHigherVersion)
 											  .ToList();
 
-			writer.WriteLine($"Detected {detectedIssues.Count} issues:");
+			detectedIssues.WriteTo(writer, main.Name, dependency.Name, dependencyHigherVersion.Name);
+		}
+
+		private static void ListPotentialIssues(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion, TextWriter writer)
+		{
+			var issueCollector = CompatiblityIssueCollector.Default;
+			var potentialIssues = issueCollector.GetCompatibilityIssuesBetween(assembly, assemblyHigherVersion)
+												.ToList();
+
+			potentialIssues.WriteTo(writer, assembly.Name, assemblyHigherVersion.Name);
+		}
+
+
+
+		/// <summary>
+		/// Writes the detected compatibility issue as a report to the specified writer.
+		/// </summary>
+		public static void WriteTo(
+			this IReadOnlyList<IDetectedCompatibilityIssue> detectedIssues,
+			TextWriter writer,
+			AssemblyNameReference assemblyName,
+			AssemblyNameReference dependencyName,
+			AssemblyNameReference dependencyHigherVersionName)
+		{
+			writer.WriteLine($"Detected {detectedIssues.Count} issues{(detectedIssues.Count == 0 ? '.' : ':')}");
+			writer.WriteLine();
+
 			foreach (var detectedIssue in detectedIssues)
 			{
 				writer.WriteLine(detectedIssue.ToDisplayString());
@@ -69,26 +96,34 @@ namespace Versioning.CLI
 
 			if (detectedIssues.Count != 0)
 			{
+				writer.WriteLine();
 				writer.WriteLine("Done");
 			}
 		}
 
-		private static void ListPotentialIssues(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion, TextWriter writer)
+
+		/// <summary>
+		/// Writes the potential compatibility issue as a report to the specified writer.
+		/// </summary>
+		public static void WriteTo(
+			this IReadOnlyList<ICompatibilityIssue> potentialIssues,
+			TextWriter writer,
+			AssemblyNameReference assemblyName,
+			AssemblyNameReference assemblyHigherVersionName)
 		{
-			if (assembly.Name.Name != assemblyHigherVersion.Name.Name)
+			if (assemblyName.Name != assemblyHigherVersionName.Name)
 			{
-				writer.WriteLine($"Warning: the same assembly but different versions should be specified, but got '{assembly.Name.Name}' and '{assemblyHigherVersion.Name.Name}'.");
+				writer.WriteLine($"Warning: the same assembly but different versions should be specified, but got '{assemblyName.Name}' and '{assemblyHigherVersionName.Name}'.");
+				writer.WriteLine();
 			}
-			else if (assembly.Name.Version >= assemblyHigherVersion.Name.Version)
+			else if (assemblyName.Version >= assemblyHigherVersionName.Version)
 			{
 				writer.WriteLine($"Warning: the second argument did not point to an assembly of higher version.");
+				writer.WriteLine();
 			}
 
-			var issueCollector = CompatiblityIssueCollector.Default;
-			var potentialIssues = issueCollector.GetCompatibilityIssuesBetween(assembly, assemblyHigherVersion)
-												.ToList();
 			writer.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues");
-			writer.WriteLine($"between assembly {assembly.Name.Name} versions {assembly.Name.Version} and {assemblyHigherVersion.Name.Version}{(potentialIssues.Count == 0 ? '.' : ':')}");
+			writer.WriteLine($"between assembly {assemblyName.Name} versions {assemblyName.Version} and {assemblyHigherVersionName.Version}{(potentialIssues.Count == 0 ? '.' : ':')}");
 			writer.WriteLine();
 
 			foreach (var issueGroup in potentialIssues.GroupBy(d => d.ToHeaderDisplayString()))
@@ -109,6 +144,5 @@ namespace Versioning.CLI
 				writer.WriteLine("Done");
 			}
 		}
-
 	}
 }

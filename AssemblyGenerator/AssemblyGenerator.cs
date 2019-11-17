@@ -28,7 +28,7 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
-			return CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
+			return CreateAssembly(new[] { sourceCode }, assemblyName, references, out var _, out var _, optimizationLevel, languageVersion);
 		}
 
 		/// <summary>
@@ -41,20 +41,20 @@ namespace Versioning
 			LanguageVersion languageVersion = LanguageVersion.Default,
 			IReadOnlyCollection<MetadataReference>? references = null)
 		{
-			return CreateAssembly(sourceCode, assemblyName, out var _, out var _, optimizationLevel, languageVersion, references);
+			return CreateAssembly(sourceCode, assemblyName, references, out var _, out var _, optimizationLevel, languageVersion);
 		}
 
 		/// <summary>
 		/// Creates an in-memory assembly containing the specified source code.
 		/// </summary>
-		public static Stream CreateAssembly(
+		internal static Stream CreateAssembly(
 			string[] sourceCode,
 			string assemblyName,
+			IReadOnlyCollection<MetadataReference>? references,
 			out MetadataReference reference,
 			out OutputKind outputKind,
 			OptimizationLevel optimizationLevel = OptimizationLevel.Release,
-			LanguageVersion languageVersion = LanguageVersion.Default,
-			IReadOnlyCollection<MetadataReference>? references = null)
+			LanguageVersion languageVersion = LanguageVersion.Default)
 		{
 			// parse
 			var parseOptions = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: languageVersion);
@@ -65,7 +65,7 @@ namespace Versioning
 			outputKind = syntaxTrees.Any(HasEntryPoint) ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary;
 			var compilationOptions = new CSharpCompilationOptions(outputKind, optimizationLevel: optimizationLevel, allowUnsafe: true);
 			Compilation compilation = CSharpCompilation.Create(assemblyName, options: compilationOptions)
-			  .AddReferences(references ?? new[] { MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location) })
+			  .AddReferences(ConcatReferencesHelper(references))
 			  .AddSyntaxTrees(syntaxTrees);
 
 			reference = compilation.ToMetadataReference();
@@ -118,10 +118,12 @@ namespace Versioning
 			IReadOnlyList<PortableExecutableReference>? otherReferences = null)
 		{
 			const string v2Attribute = "[assembly: System.Reflection.AssemblyVersion(\"2.0.0\")]";
-
-			var dependencyV1 = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, out MetadataReference reference, out var _);
+			
+			var dependencyV1 = CreateAssembly(new[] { referencedAssemblySourceCode }, referencedAssemblyName, null, out MetadataReference reference, out var _);
 			var dependencyV2 = CreateAssembly(new[] { referencedAssemblySourceCodev2, v2Attribute }, referencedAssemblyName);
-			var main = CreateAssembly(new[] { sourceCode }, assemblyName, out var _, out var outputKind, references: otherReferences.Concat(new [] { reference }).ToList());
+
+			var references = ConcatReferencesHelper(otherReferences, reference);
+			var main = CreateAssembly(new[] { sourceCode }, assemblyName, references, out var _, out var outputKind);
 
 			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyV1), AssemblyDefinition.ReadAssembly(dependencyV2), AssemblyDefinition.ReadAssembly(main));
 
@@ -140,16 +142,16 @@ namespace Versioning
 			PortableExecutableReference dependencyReference,
 			string dependencyToBeLoadedPath,
 			string[] sourceCode,
+			IReadOnlyList<PortableExecutableReference> otherReferences,
 			out (AssemblyDefinition dependencyV1, AssemblyDefinition dependencyV2, AssemblyDefinition main) assemblyDefinitions,
-			IReadOnlyList<PortableExecutableReference>? otherReferences = null,
 			string assemblyName = "defaultAssemblyName")
 		{
-			otherReferences ??= Array.Empty<PortableExecutableReference>();
+			var references = ConcatReferencesHelper(otherReferences, dependencyReference);
+			var assemblyStream = CreateAssembly(sourceCode, assemblyName, references, out var _, out var outputKind);
 
-			var references = otherReferences.Concat(new[] { dependencyReference }).ToList();
-			var assemblyStream = CreateAssembly(sourceCode, assemblyName, out var _, out var outputKind, references: references);
-
-			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyReference.FilePath), AssemblyDefinition.ReadAssembly(dependencyToBeLoadedPath), AssemblyDefinition.ReadAssembly(assemblyStream));
+			assemblyDefinitions = (AssemblyDefinition.ReadAssembly(dependencyReference.FilePath),
+				                   AssemblyDefinition.ReadAssembly(dependencyToBeLoadedPath),
+				                   AssemblyDefinition.ReadAssembly(assemblyStream));
 
 			return CopyToTempDirectory((assemblyName, assemblyStream),
 									   outputKind,
@@ -190,6 +192,19 @@ namespace Versioning
 				stream.CopyTo(fileStream);
 				stream.Seek(0, SeekOrigin.Begin);
 			}
+		}
+
+		/// <summary>
+		/// Replaces the <paramref name="otherReferences"/> by the default references if empty, and appends the <paramref name="explicitReferences"/>.
+		/// </summary>
+		private static IReadOnlyList<MetadataReference> ConcatReferencesHelper(
+			IReadOnlyCollection<MetadataReference>? otherReferences,
+			params MetadataReference[] explicitReferences)
+		{
+			if(otherReferences == null || otherReferences.Count == 0)
+				otherReferences = new[] { MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location) };
+
+			return otherReferences.Concat(explicitReferences).ToList();
 		}
 	}
 }

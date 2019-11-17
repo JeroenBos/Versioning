@@ -80,7 +80,7 @@ namespace Versioning.UsageDetector.Tests
 			CompatiblityIssueCollector? issueRaiser = null,
 			params PortableExecutableReference[] otherDependencies)
 		{
-			var entryPoint = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferentVersion(dependencyReference, runtimeDependencyPath, sourceCode_Main, out var assemblyDefinitions, otherDependencies);
+			var entryPoint = AssemblyGenerator.LoadAssemblyWithReferenceAgainstDifferentVersion(dependencyReference, runtimeDependencyPath, sourceCode_Main, otherDependencies, out var assemblyDefinitions);
 
 			var (dependencyV1, dependencyV2, main) = assemblyDefinitions;
 			var issues = UsageDetector.DetectCompatibilityIssues(issueRaiser ?? CompatiblityIssueCollector.Default, main, dependencyV1, dependencyV2).ToList();

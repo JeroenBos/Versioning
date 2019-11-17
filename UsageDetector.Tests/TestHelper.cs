@@ -11,7 +11,28 @@ namespace Versioning.UsageDetector.Tests
 {
 	class TestHelper
 	{
-		public static string PackagesDirectory => Path.GetFullPath("../../../Packages");
+		[OneTimeSetUp]
+		public static async Task EnsureDependenciesInstalled()
+		{
+			if (!File.Exists(NodaTime_1_4_7Path_3_5))
+			{
+				await NugetInstall("NodaTime", "1.4.7");
+			}
+			if (!File.Exists(NodaTime_2_4_7Path_4_5))
+			{
+				await NugetInstall("NodaTime", "2.4.7");
+			}
+		}
+
+		public static string PackagesDirectory
+		{
+			get
+			{
+				var path = Environment.GetEnvironmentVariable("NUGET_PACKAGES")
+						?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+				return Path.GetFullPath(path);
+			}
+		}
 		public static string NodaTime_1_4_7Path_3_5 => Path.Combine(PackagesDirectory, "NodaTime", "1.4.7", "lib", "net35-Client", "NodaTime.dll");
 		public static string NodaTime_2_4_7Path_4_5 => Path.Combine(PackagesDirectory, "NodaTime", "2.4.7", "lib", "net45", "NodaTime.dll");
 
@@ -24,6 +45,14 @@ namespace Versioning.UsageDetector.Tests
 				.Select(path => MetadataReference.CreateFromFile(path))
 				.ToArray();
 			return assemblies;
+		}
+
+		public static Task<int> NugetInstall(string packageName, string? version = null)
+		{
+			string versionArg = version != null ? " -Version " + version : "";
+			string pathArg = " -OutputDirectory " + "\"" + PackagesDirectory + "\"";
+
+			return ProcessExtensions.StartIndependentlyInvisiblyAsync("nuget.exe", $"install {packageName} {versionArg} {pathArg}");
 		}
 
 		public static (ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(

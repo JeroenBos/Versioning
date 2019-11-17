@@ -27,8 +27,4 @@
     <ProjectReference Include="..\UsageDetector\UsageDetector.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="nuget install NodaTime -Version 1.4.7 -OutputDirectory Packages&#xD;&#xA;nuget install NodaTime -Version 2.4.7 -OutputDirectory Packages" />
-  </Target>
-
 </Project>

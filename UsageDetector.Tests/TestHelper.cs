@@ -73,7 +73,7 @@ namespace Versioning.UsageDetector.Tests
 			return ProcessExtensions.StartIndependentlyInvisiblyAsync("nuget.exe", $"install {packageName} {versionArg} {pathArg}");
 		}
 
-		public static (ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static EntryPointPlusIssues DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
 			PortableExecutableReference dependencyReference,
 			string runtimeDependencyPath,
 			string[] sourceCode_Main,
@@ -93,7 +93,7 @@ namespace Versioning.UsageDetector.Tests
 		/// Also returns raised issues.
 		/// </summary>
 		/// <param name="issueRaiser"> Specify null to use the default issue collector. </param>
-		public static (ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues) DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
+		public static EntryPointPlusIssues DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
 			string sourceCode_DependencyV1,
 			string sourceCode_DependencyV2,
 			string sourceCode_Main,

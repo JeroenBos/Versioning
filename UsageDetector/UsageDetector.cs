@@ -13,6 +13,31 @@ namespace Versioning.UsageDetector
 	public static class UsageDetector
 	{
 		/// <summary>
+		/// This is the entry point for solving the original problem: 
+		/// - Detect all type and member references to a particular assembly.
+		/// - Detect all differences between two versions of that assembly.
+		/// - Find the intersection.
+		/// </summary>
+		public static IEnumerable<DetectedCompatibilityIssue> DetectCompatibilityIssues(
+			CompatiblityIssueCollector collector,
+			AssemblyDefinition main,
+			AssemblyDefinition dependency,
+			AssemblyDefinition dependencyHigherVersion)
+		{
+			var references = GetAllReferences(main)
+							   .Where(reference => reference.RefersIn(dependency))
+							   .ToList();
+
+			var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
+								  .ToList();
+
+			return from issue in issues
+				   let locations = DetectIssue(issue, references).ToList()
+				   where locations.Count != 0
+				   select new DetectedCompatibilityIssue(issue, locations);
+		}
+
+		/// <summary>
 		/// Gets all <see cref="MemberReference"/>s in the specified assembly. 
 		/// </summary>
 		public static IEnumerable<MemberReference> GetAllReferences(AssemblyDefinition assembly)
@@ -27,7 +52,7 @@ namespace Versioning.UsageDetector
 		/// <summary>
 		/// Gets all references in the .NET object hierarchy of the specified object.
 		/// </summary>
-		static IEnumerable<object> AllReferenceTypeObjectsIn(object obj)
+		private static IEnumerable<object> AllReferenceTypeObjectsIn(object obj)
 		{
 			if (obj == null)
 				return Enumerable.Empty<object>();
@@ -85,37 +110,12 @@ namespace Versioning.UsageDetector
 			}
 		}
 
-		static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
-
-		/// <summary>
-		/// This is the entry point for solving the original problem: 
-		/// - Detect all type and member references to a particular assembly.
-		/// - Detect all differences between two versions of that assembly.
-		/// - Find the intersection.
-		/// </summary>
-		public static IEnumerable<DetectedCompatibilityIssue> DetectCompatibilityIssues(
-			CompatiblityIssueCollector collector,
-			AssemblyDefinition main,
-			AssemblyDefinition dependency,
-			AssemblyDefinition dependencyHigherVersion)
-		{
-			var references = GetAllReferences(main)
-							   .Where(reference => reference.RefersIn(dependency))
-							   .ToList();
-
-			var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
-								  .ToList();
-
-			return from issue in issues
-				   let locations = DetectIssue(issue, references).ToList()
-				   where locations.Count != 0
-				   select new DetectedCompatibilityIssue(issue, locations);
-		}
+		private static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
 
 		/// <summary>
 		/// Locates where the potential compatibility issue would actually be an issue.
 		/// </summary>
-		static IEnumerable<MemberReference> DetectIssue(ICompatibilityIssue potentialIssue, IReadOnlyList<MemberReference> references)
+		private static IEnumerable<MemberReference> DetectIssue(ICompatibilityIssue potentialIssue, IReadOnlyList<MemberReference> references)
 		{
 			var locations = potentialIssue switch
 			{

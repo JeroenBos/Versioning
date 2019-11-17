@@ -50,8 +50,6 @@ namespace Versioning
 		private static Task<int> startIndependentlyAsync(string executable, bool visibly, params string[] arguments)
 		{
 			if (string.IsNullOrEmpty(executable)) throw new ArgumentNullException(nameof(executable));
-			if (!executable.EndsWith(".exe")) throw new ArgumentException();
-			if (!File.Exists(executable)) throw new ArgumentException(); // thrown exception should propagate
 			if (arguments == null) throw new ArgumentNullException(nameof(arguments));
 			if (arguments.Any(string.IsNullOrEmpty)) throw new ArgumentException(nameof(arguments));
 

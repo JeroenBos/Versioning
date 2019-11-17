@@ -46,13 +46,9 @@ class C
 		var i = SystemClock.Instance.Now;
 	}
 }";
-
-			string nodatime1_4_7Path_3_5 = Path.Combine(PackagesDirectory, "NodaTime.1.4.7", "lib", "net35-Client", "NodaTime.dll");
-			string nodatime2_4_7Path = Path.Combine(PackagesDirectory, "NodaTime.2.4.7", "lib", "net45", "NodaTime.dll");
-
 			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
-				dependencyReference: MetadataReference.CreateFromFile(nodatime1_4_7Path_3_5),
-				runtimeDependencyPath: nodatime2_4_7Path,
+				dependencyReference: MetadataReference.CreateFromFile(NodaTime_1_4_7Path_3_5),
+				runtimeDependencyPath: NodaTime_2_4_7Path_4_5,
 				sourceCode_Main: new[] { sourceCode_Main },
 				otherDependencies: Framework4_7_2
 			);

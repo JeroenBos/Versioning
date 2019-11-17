@@ -12,6 +12,9 @@ namespace Versioning.UsageDetector.Tests
 	class TestHelper
 	{
 		public static string PackagesDirectory => Path.GetFullPath("../../../Packages");
+		public static string NodaTime_1_4_7Path_3_5 => Path.Combine(PackagesDirectory, "NodaTime", "1.4.7", "lib", "net35-Client", "NodaTime.dll");
+		public static string NodaTime_2_4_7Path_4_5 => Path.Combine(PackagesDirectory, "NodaTime", "2.4.7", "lib", "net45", "NodaTime.dll");
+
 
 		public static PortableExecutableReference[] Framework4_7_2 => Framework("C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.7.2/");
 		internal static PortableExecutableReference[] Framework(string path)

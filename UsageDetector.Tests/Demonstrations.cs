@@ -11,7 +11,7 @@ using Versioning.Issues;
 
 namespace Versioning.UsageDetector.Tests
 {
-	// This class provides examples of runtime binding exceptions being thrown whenever an issues is raised
+	// This class provides examples of runtime binding exceptions being thrown whenever an issues is raised too
 	class Demonstrations : TestHelper
 	{
 		[Test]
@@ -32,8 +32,8 @@ class C
 	}
 }";
 			var (entryPoint, detectedIssues) = DetectIssuesAndLoadAssemblyWithReferenceAgainstDifferentVersion(
-				dependencyReference: MetadataReference.CreateFromFile(NodaTime_1_4_7Path_3_5),
-				runtimeDependencyPath: NodaTime_2_4_7Path_4_5,
+				compileTimeDependency: MetadataReference.CreateFromFile(NodaTime_1_4_7Path_3_5),
+				runtimeDependency: MetadataReference.CreateFromFile(NodaTime_2_4_7Path_4_5),
 				sourceCode_Main: new[] { sourceCode_Main },
 				otherDependencies: _NETFramework4_5_Or_Higher
 			);

@@ -11,6 +11,7 @@ namespace Versioning
 {
 	/// <summary>
 	/// A delegate representing the entry point of an assembly when launched as a process, wrapped to return the exit code, standard output and error output.
+	/// It is wrapped in a separate process because running the .NET framework runtime in a .NET Core environment is not supported.
 	/// </summary>
 	public delegate Task<(int ExitCode, string Output, string ErrorOutput)> ProcessDelegate();
 

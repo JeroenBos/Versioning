@@ -2,8 +2,14 @@
 
 namespace Versioning.UsageDetector.Tests
 {
+	/// <summary>
+	/// A simple record type for the type <see cref="(ProcessDelegate? entryPoint, IReadOnlyList{IDetectedCompatibilityIssue} issues)"/>.
+	/// </summary>
 	public readonly struct EntryPointPlusIssues
 	{
+/// <summary>
+/// Gets a delegate wrapping a call to an assembly entry point in a seperate process.
+/// </summary>
 		public ProcessDelegate? EntryPoint { get; }
 		public IReadOnlyList<IDetectedCompatibilityIssue> Issues { get; }
 		public EntryPointPlusIssues(ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues)

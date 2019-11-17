@@ -6,7 +6,8 @@ using System.Text;
 namespace Versioning.UsageDetector
 {
 	/// <summary>
-	/// <see cref="Mono.Cecil.IMemberDefinition"/> and <see cref="Mono.Cecil.MemberReference"/> do not implement equality comparison,
+	/// Compares <see cref="MemberReference"/>s for equality comparison by whether they point to the same assembly item.
+	/// Since <see cref="Mono.Cecil.IMemberDefinition"/> and <see cref="Mono.Cecil.MemberReference"/> do not implement equality comparison,
 	/// so we do that here.
 	/// </summary>
 	class MemberEqualityComparer : IEqualityComparer<MemberReference>

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Versioning.Issues;
 
 namespace Versioning.UsageDetector.Tests
 {
@@ -55,7 +56,10 @@ class C
 				sourceCode_Main: new[] { sourceCode_Main },
 				otherDependencies: Framework4_7_2
 			);
-			Assert.AreEqual(0, detectedIssues.Count);
+			Assert.AreEqual(1, detectedIssues.Count);
+			Assert.IsAssignableFrom<MissingMemberIssue>(detectedIssues[0].Issue);
+			Assert.AreEqual(((MissingMemberIssue)detectedIssues[0].Issue).MissingMember.Name, "Now");
+
 			var (_, _, errorOutput) = await entryPoint!();
 			Assert.IsTrue(errorOutput.Contains("System.IO.FileLoadException: Could not load file or assembly 'NodaTime, Version=1.4"));
 			Assert.IsTrue(errorOutput.Contains("The located assembly's manifest definition does not match the assembly reference."));

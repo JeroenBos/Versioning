@@ -35,7 +35,7 @@ class C
 				dependencyReference: MetadataReference.CreateFromFile(NodaTime_1_4_7Path_3_5),
 				runtimeDependencyPath: NodaTime_2_4_7Path_4_5,
 				sourceCode_Main: new[] { sourceCode_Main },
-				otherDependencies: Framework4_7_2
+				otherDependencies: _NETFramework4_5_Or_Higher
 			);
 			Assert.AreEqual(1, detectedIssues.Count);
 			Assert.IsAssignableFrom<MissingMemberIssue>(detectedIssues[0].Issue);

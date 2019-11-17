@@ -40,71 +40,73 @@ namespace Versioning.CLI
 				return;
 			}
 
+			using var consoleWriter = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
+			Console.SetOut(consoleWriter);
 
 			if (args.Length == 3)
 			{
-				ListDetectedIssues(assemblies[0], assemblies[1], assemblies[2]);
+				ListDetectedIssues(assemblies[0], assemblies[1], assemblies[2], consoleWriter);
 			}
 			else
 			{
-				ListPotentialIssues(assemblies[0], assemblies[1]);
+				ListPotentialIssues(assemblies[0], assemblies[1], consoleWriter);
 			}
 
 			Console.ReadKey();
 		}
 
-		private static void ListDetectedIssues(AssemblyDefinition main, AssemblyDefinition dependency, AssemblyDefinition dependencyHigherVersion)
+		private static void ListDetectedIssues(AssemblyDefinition main, AssemblyDefinition dependency, AssemblyDefinition dependencyHigherVersion, TextWriter writer)
 		{
 			var issueCollector = CompatiblityIssueCollector.Default;
 			var detectedIssues = IssueDetector.DetectCompatibilityIssues(issueCollector, main, dependency, dependencyHigherVersion)
 											  .ToList();
 
-			Console.WriteLine($"Detected {detectedIssues.Count} issues:");
+			writer.WriteLine($"Detected {detectedIssues.Count} issues:");
 			foreach (var detectedIssue in detectedIssues)
 			{
-				Console.WriteLine(detectedIssue.ToDisplayString());
+				writer.WriteLine(detectedIssue.ToDisplayString());
 			}
 
 			if (detectedIssues.Count != 0)
 			{
-				Console.WriteLine("Done");
+				writer.WriteLine("Done");
 			}
 		}
 
-		private static void ListPotentialIssues(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion)
+		private static void ListPotentialIssues(AssemblyDefinition assembly, AssemblyDefinition assemblyHigherVersion, TextWriter writer)
 		{
 			if (assembly.Name.Name != assemblyHigherVersion.Name.Name)
 			{
-				Console.WriteLine($"Warning: the same assembly but different versions should be specified, but got '{assembly.Name.Name}' and '{assemblyHigherVersion.Name.Name}'.");
+				writer.WriteLine($"Warning: the same assembly but different versions should be specified, but got '{assembly.Name.Name}' and '{assemblyHigherVersion.Name.Name}'.");
 			}
 			else if (assembly.Name.Version >= assemblyHigherVersion.Name.Version)
 			{
-				Console.WriteLine($"Warning: the second argument did not point to an assembly of higher version.");
+				writer.WriteLine($"Warning: the second argument did not point to an assembly of higher version.");
 			}
 
 			var issueCollector = CompatiblityIssueCollector.Default;
 			var potentialIssues = issueCollector.GetCompatibilityIssuesBetween(assembly, assemblyHigherVersion)
 												.ToList();
-			Console.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues");
-			Console.WriteLine($"between assembly {assembly.Name.Name} versions {assembly.Name.Version} and {assemblyHigherVersion.Name.Version}{(potentialIssues.Count == 0 ? '.' : ':')}");
-			Console.WriteLine();
+			writer.WriteLine($"Detected {potentialIssues.Count} potential compatibility issues");
+			writer.WriteLine($"between assembly {assembly.Name.Name} versions {assembly.Name.Version} and {assemblyHigherVersion.Name.Version}{(potentialIssues.Count == 0 ? '.' : ':')}");
+			writer.WriteLine();
 
 			foreach (var issueGroup in potentialIssues.GroupBy(d => d.ToHeaderDisplayString()))
 			{
-				Console.WriteLine(issueGroup.Key); // the header
+				writer.WriteLine(issueGroup.Key); // the header
 
 				var sortedIssueGroup = issueGroup.Select(issue => issue.ToDisplayString()).OrderBy(_ => _);
 				foreach (string issue in sortedIssueGroup)
 				{
-					Console.Write("- ");
-					Console.WriteLine(issue);
+					writer.Write("- ");
+					writer.WriteLine(issue);
 				}
-				Console.WriteLine();
+				writer.WriteLine();
 			}
 
 			if (potentialIssues.Count != 0)
 			{
-				Console.WriteLine("Done");
+				writer.WriteLine("Done");
 			}
 		}
 

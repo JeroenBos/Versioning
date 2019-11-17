@@ -16,8 +16,8 @@ namespace Versioning.Tests
 		public void EventMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { event System.Action a; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -29,8 +29,8 @@ namespace Versioning.Tests
 		public void EventMadeProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public event System.Action a; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected event System.Action a; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -42,8 +42,8 @@ namespace Versioning.Tests
 		public void ProtectedEventMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected event System.Action a; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private event System.Action a; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -55,8 +55,8 @@ namespace Versioning.Tests
 		public void InternalEventMadePrivateIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal event System.Action a; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private event System.Action a; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { internal event System.Action a; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private event System.Action a; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -68,8 +68,8 @@ namespace Versioning.Tests
 		public void FieldMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -81,8 +81,8 @@ namespace Versioning.Tests
 		public void FieldMadeProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -94,8 +94,8 @@ namespace Versioning.Tests
 		public void ProtectedFieldMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -107,8 +107,8 @@ namespace Versioning.Tests
 		public void InternalFieldMadePrivateIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { internal int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -120,8 +120,8 @@ namespace Versioning.Tests
 		public void MethodMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { void m() { } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -133,8 +133,8 @@ namespace Versioning.Tests
 		public void MethodMadeProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public void m() { } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected void m() { } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public void m() { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected void m() { } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -146,8 +146,8 @@ namespace Versioning.Tests
 		public void NestedStructMadeProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public struct S { } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected struct S { }}"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public struct S { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected struct S { }}"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -160,8 +160,8 @@ namespace Versioning.Tests
 		public void NestedProtectedStructMadeProtectedInternalIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected struct S { } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected internal struct S { }}"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected struct S { } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected internal struct S { }}"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -173,8 +173,8 @@ namespace Versioning.Tests
 		public void MemberInInternalTypeReducesAccessibilityIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { public int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -186,8 +186,8 @@ namespace Versioning.Tests
 		public void ProtectedMemberThatChangesToPrivateProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private protected int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -200,8 +200,8 @@ namespace Versioning.Tests
 		public void InternalProtectedMemberThatChangesToPrivateProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal protected int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { internal protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private protected int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -214,8 +214,8 @@ namespace Versioning.Tests
 		public void PrivateProtectedMemberThatChangesToProtectedIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -227,8 +227,8 @@ namespace Versioning.Tests
 		public void PrivateProtectedMemberThatChangesToInternalProtectedIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { private protected int i; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { internal protected int i; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { private protected int i; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { internal protected int i; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -240,8 +240,8 @@ namespace Versioning.Tests
 		public void PrivateProtectedChangeInInternalClassIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { private protected int i;  internal protected int j; public int k; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { internal protected int i; private protected int j;  private int k; }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { private protected int i;  internal protected int j; public int k; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { internal protected int i; private protected int j;  private int k; }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

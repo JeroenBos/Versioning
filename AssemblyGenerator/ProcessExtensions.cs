@@ -9,7 +9,14 @@ using System.Threading.Tasks;
 
 namespace Versioning
 {
+	/// <summary>
+	/// A delegate representing the entry point of an assembly when launched as a process, wrapped to return the exit code, standard output and error output.
+	/// </summary>
 	public delegate Task<(int ExitCode, string Output, string ErrorOutput)> ProcessDelegate();
+
+	/// <summary>
+	/// Contains some extension methods for starting processes.
+	/// </summary>
 	public static class ProcessExtensions
 	{
 		/// <summary>

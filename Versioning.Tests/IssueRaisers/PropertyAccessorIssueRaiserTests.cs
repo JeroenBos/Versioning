@@ -17,8 +17,8 @@ namespace Versioning.Tests
 		public void MissingPropertyIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P => 0; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P => 0; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -31,8 +31,8 @@ namespace Versioning.Tests
 		public void MissingAutoimplementedPropertyIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -45,8 +45,8 @@ namespace Versioning.Tests
 		public void MissingGetterIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; set; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { set { } } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; set; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { set { } } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -58,8 +58,8 @@ namespace Versioning.Tests
 		public void MissingSetterIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; set; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; set; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -74,8 +74,8 @@ namespace Versioning.Tests
 			/// the difference with <see cref="MissingFieldIsReported"/> is the assembly contents are reversed
 
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream(""));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly(""));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -87,8 +87,8 @@ namespace Versioning.Tests
 		public void PropertyMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { int P { get; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { int P { get; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -100,8 +100,8 @@ namespace Versioning.Tests
 		public void PropertyMadeProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { protected int P { get; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { protected int P { get; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -113,8 +113,8 @@ namespace Versioning.Tests
 		public void PropertyOnMissingTypeIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int P { get; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { public int P { get; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -128,8 +128,8 @@ namespace Versioning.Tests
 		public void AccessorMadePrivateIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; set; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; private set; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; set; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; private set; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -142,8 +142,8 @@ namespace Versioning.Tests
 		public void AccessorMadeProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; set; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; protected set; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; set; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; protected set; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -156,8 +156,8 @@ namespace Versioning.Tests
 		public void AccessorMadePrivateFromProtectedIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; protected set; } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int P { get; private set; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; protected set; } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int P { get; private set; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -170,8 +170,8 @@ namespace Versioning.Tests
 		public void MissingIndexerIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int this[object obj] => 0; }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int this[object obj] => 0; }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -184,8 +184,8 @@ namespace Versioning.Tests
 		public void MissingIndexerGetterIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int this[object obj] { get => 0;  set { } } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int this[object obj] { set { } } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int this[object obj] { get => 0;  set { } } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int this[object obj] { set { } } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -198,8 +198,8 @@ namespace Versioning.Tests
 		public void MissingIndexerSetterIsReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int this[object obj] { get => 0;  set { } } }"));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("public class A { public int this[object obj] { get => 0; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int this[object obj] { get => 0;  set { } } }"));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("public class A { public int this[object obj] { get => 0; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();
@@ -212,8 +212,8 @@ namespace Versioning.Tests
 		public void AccessorRemovalInInternalPropertyIsNotReported()
 		{
 			// arrange
-			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i { get; set; } } public class B { public int i { get; internal set; } } "));
-			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateStream("class A { public int i { get; } }      public class B { public int i { get; } }"));
+			var a = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { public int i { get; set; } } public class B { public int i { get; internal set; } } "));
+			var b = AssemblyDefinition.ReadAssembly(AssemblyGenerator.CreateAssembly("class A { public int i { get; } }      public class B { public int i { get; } }"));
 
 			// act
 			var issues = raiser.GetCompatibilityIssuesBetween(a, b).ToList();

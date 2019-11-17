@@ -99,25 +99,17 @@ namespace Versioning.UsageDetector
 			AssemblyDefinition dependency,
 			AssemblyDefinition dependencyHigherVersion)
 		{
-			var allReferences = GetAllReferences(main);
-			var usage = allReferences.Where(reference => reference.RefersIn(dependency))
-									 .ToList();
+			var references = GetAllReferences(main)
+							   .Where(reference => reference.RefersIn(dependency))
+							   .ToList();
 
 			var issues = collector.GetCompatibilityIssuesBetween(dependency, dependencyHigherVersion)
 								  .ToList();
 
-
 			return from issue in issues
-				   let locations = DetectIssue(issue, usage).ToList()
+				   let locations = DetectIssue(issue, references).ToList()
 				   where locations.Count != 0
 				   select new DetectedCompatibilityIssue(issue, locations);
-		}
-
-		static bool RefersIn(this MemberReference reference, AssemblyDefinition dependency)
-		{
-			var type = reference as TypeReference ?? reference.DeclaringType;
-
-			return dependency.FullName == (type.Scope as AssemblyNameReference)?.FullName;
 		}
 
 		/// <summary>

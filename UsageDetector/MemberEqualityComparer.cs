@@ -35,9 +35,22 @@ namespace Versioning.UsageDetector
 
 	static class MemberEqualityComparerExtensions
 	{
+		/// <summary>
+		/// Gets whether the specified reference points to the specified definition.
+		/// </summary>
 		public static bool RefersTo(this MemberReference reference, IMemberDefinition definition)
 		{
 			return definition is MemberReference def && MemberEqualityComparer.Instance.Equals(reference, def);
+		}
+
+		/// <summary>
+		/// Gets whether the specified references point to an assembly item in the specified assembly.
+		/// </summary>
+		public static bool RefersIn(this MemberReference reference, AssemblyDefinition assembly)
+		{
+			var type = reference as TypeReference ?? reference.DeclaringType;
+
+			return assembly.FullName == (type.Scope as AssemblyNameReference)?.FullName;
 		}
 	}
 }

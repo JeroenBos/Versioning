@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using Mono.Cecil;
 
-namespace Versioning.Issues
+namespace Versioning.DiffDetector.Issues
 {
 
 	public interface IMissingMemberCompatibilityIssue : ICompatibilityIssue

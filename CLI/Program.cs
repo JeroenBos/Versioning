@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Versioning.DiffDetector;
 using Versioning.UsageDetector;
 using IssueDetector = Versioning.UsageDetector.UsageDetector;
 

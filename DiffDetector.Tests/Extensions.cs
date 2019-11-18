@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Versioning.Tests
+namespace Versioning.DiffDetector.Tests
 {
 	public static class Extensions
 	{

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 
-namespace Versioning
+namespace Versioning.DiffDetector
 {
 	public interface ICompatibilityIssueRaiser { }
 	/// <summary>

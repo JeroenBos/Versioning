@@ -1,7 +1,7 @@
 ﻿using System;
 using Mono.Cecil;
 
-namespace Versioning.Issues
+namespace Versioning.DiffDetector.Issues
 {
 	public class MemberAccessibilityReducedIssue : ICompatibilityIssue
 	{

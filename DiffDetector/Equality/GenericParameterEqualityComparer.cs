@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Versioning.Equality
+namespace Versioning.DiffDetector.Equality
 {
 	class GenericParameterEqualityComparer : IEqualityComparer<Type>
 	{

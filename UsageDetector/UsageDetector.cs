@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Versioning.Issues;
+using Versioning.DiffDetector;
+using Versioning.DiffDetector.Issues;
 
 namespace Versioning.UsageDetector
 {

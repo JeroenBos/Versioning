@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Versioning.Issues;
+using Versioning.DiffDetector.Issues;
 
-namespace Versioning.IssueRaisers
+namespace Versioning.DiffDetector.IssueRaisers
 {
 	public class MissingMemberIssueRaiser : ICompatibilityIssueRaiser<IMemberDefinition>
 	{

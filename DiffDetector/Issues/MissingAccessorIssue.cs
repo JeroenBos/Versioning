@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Versioning.Issues
+namespace Versioning.DiffDetector.Issues
 {
 	public class MissingPropertyIssue : IMissingMemberCompatibilityIssue
 	{

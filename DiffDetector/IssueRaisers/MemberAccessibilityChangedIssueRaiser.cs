@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Versioning.Issues;
+using Versioning.DiffDetector.Issues;
 
-namespace Versioning.IssueRaisers
+namespace Versioning.DiffDetector.IssueRaisers
 {
 	public class MemberAccessibilityReducedIssueRaiser : ICompatibilityIssueRaiser<IMemberDefinition>
 	{

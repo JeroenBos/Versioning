@@ -29,13 +29,13 @@ Library usages is discussed now.
 Let's sketch a quick overview of the code hierarchy and responsibilities in this project.
 
 - `AssemblyGenerator`, which is used for testing purposes only, contains helper methods to generate assemblies on the fly using Roslyn, where they are scanned and run.
-- `Versioning` is the project dedicated to solving the first part of the problem, 
+- `DiffDetector` is the project dedicated to solving the first part of the problem, 
    namely to list all differences between two assembly versions.
    The suggested method for external consumption is 
    `CompatiblityIssueCollector.Default.GetCompatibilityIssuesBetween(assembly, otherAssembly)`.
    The result is a list of implementations of the interface `ICompatibilityIssue`.
 - `UsageDetector` is the project dedicated to solving the second part of the problem, 
-namely to filter all differences listed by `Versioning` on relevance to a third assembly, mostly referred to as the 'main assembly'.
+namely to filter all differences listed by `DiffDetector` on relevance to a third assembly, mostly referred to as the 'main assembly'.
 The suggested method for external consumption is 
    `UsageDetector.DetectCompatibilityIssues(collector, mainAssembly, dependencyAssembly, dependencyAssemblyHigherVersion)`.
 The result is a list of implementations of the interface `IDetectedCompatibilityIssue`.

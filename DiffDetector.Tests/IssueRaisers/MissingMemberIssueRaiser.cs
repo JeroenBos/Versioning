@@ -3,10 +3,10 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Versioning.IssueRaisers;
-using Versioning.Issues;
+using Versioning.DiffDetector.IssueRaisers;
+using Versioning.DiffDetector.Issues;
 
-namespace Versioning.Tests
+namespace Versioning.DiffDetector.Tests
 {
 	public class MissingMemberTests
 	{

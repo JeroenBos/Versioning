@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using Mono.Cecil;
 
-namespace Versioning.Equality
+namespace Versioning.DiffDetector.Equality
 {
 	/// <summary>
 	/// Compares methods for equality in view of (binary) compatibility.

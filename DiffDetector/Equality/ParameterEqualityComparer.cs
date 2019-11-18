@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Versioning.Equality
+namespace Versioning.DiffDetector.Equality
 {
 	class ParameterEqualityComparer : IEqualityComparer<ParameterInfo>
 	{

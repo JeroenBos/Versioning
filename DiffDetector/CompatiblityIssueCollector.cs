@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Versioning.Equality;
+using Versioning.DiffDetector.Equality;
 using Mono.Cecil;
 using Assembly = System.Reflection.Assembly;
 using System.Collections.ObjectModel;
 using System.IO;
-using Versioning.IssueRaisers;
+using Versioning.DiffDetector.IssueRaisers;
 
-namespace Versioning
+namespace Versioning.DiffDetector
 {
 	/// <summary>
 	/// So initially the goals are:

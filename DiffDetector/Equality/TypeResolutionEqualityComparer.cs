@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Versioning.Equality
+namespace Versioning.DiffDetector.Equality
 {
 	/// <summary>
 	/// Compares types for equality in view of (binary) compatibility.

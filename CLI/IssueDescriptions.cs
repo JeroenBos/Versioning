@@ -1,7 +1,8 @@
 ﻿using Mono.Cecil;
 using System;
 using System.Collections.Generic;
-using Versioning.Issues;
+using Versioning.DiffDetector;
+using Versioning.DiffDetector.Issues;
 using Versioning.UsageDetector;
 
 namespace Versioning.CLI

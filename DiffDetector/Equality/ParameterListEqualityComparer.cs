@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Versioning.Equality
+namespace Versioning.DiffDetector.Equality
 {
 	class ParameterListEqualityComparer : IEqualityComparer<IReadOnlyList<ParameterInfo>>
 	{

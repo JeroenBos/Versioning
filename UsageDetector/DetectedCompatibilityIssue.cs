@@ -1,5 +1,6 @@
 ﻿using Mono.Cecil;
 using System.Collections.Generic;
+using Versioning.DiffDetector;
 
 namespace Versioning.UsageDetector
 {

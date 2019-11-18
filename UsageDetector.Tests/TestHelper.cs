@@ -7,10 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Versioning.CLI;
+using Versioning.DiffDetector;
 using TargetDotNetFrameworkVersion = Microsoft.Build.Utilities.TargetDotNetFrameworkVersion;
 using ToolLocationHelper = Microsoft.Build.Utilities.ToolLocationHelper;
-using Versioning.CLI;
-
 
 namespace Versioning.UsageDetector.Tests
 {

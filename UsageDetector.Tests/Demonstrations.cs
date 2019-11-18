@@ -19,10 +19,6 @@ namespace Versioning.UsageDetector.Tests
 		{
 			// arrange
 			const string sourceCode_Main = @"
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using NodaTime; 
 
 class C 

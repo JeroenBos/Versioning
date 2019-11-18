@@ -1,0 +1,2 @@
+Detected 0 potential compatibility issues
+between assembly NodaTime versions 2.0.0.0 and 2.4.7.0:

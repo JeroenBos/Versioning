@@ -1,0 +1,15 @@
+Detected 9 potential compatibility issues
+between assembly Newtonsoft.Json versions 10.0.0.0 and 12.0.0.0:
+
+The following members were not present in the newer assembly:
+- Newtonsoft.Json.JsonSerializer::Binder
+- Newtonsoft.Json.JsonSerializerSettings::Binder
+- Newtonsoft.Json.Serialization.ITraceWriter::LevelFilter
+- Newtonsoft.Json.Serialization.ITraceWriter::Trace
+- Newtonsoft.Json.Serialization.MemoryTraceWriter::LevelFilter
+- Newtonsoft.Json.Serialization.MemoryTraceWriter::Trace
+- Newtonsoft.Json.SerializationBinder
+- Newtonsoft.Json.TraceLevel
+- System.Runtime.Serialization.Formatters.FormatterAssemblyStyle
+
+Done

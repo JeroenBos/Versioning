@@ -1,0 +1,43 @@
+Detected 35 potential compatibility issues
+between assembly Newtonsoft.Json versions 4.0.0.0 and 6.0.0.0:
+
+The following members reduced their visibility in the newer assembly:
+- Newtonsoft.Json.JsonWriter::.ctor (Public -> Family)
+
+The following members were not present in the newer assembly:
+- Newtonsoft.Json.Converters.BinaryConverter
+- Newtonsoft.Json.Converters.DataSetConverter
+- Newtonsoft.Json.Converters.DataTableConverter
+- Newtonsoft.Json.Converters.EntityKeyMemberConverter
+- Newtonsoft.Json.Converters.JsonDateTimeSerializationMode
+- Newtonsoft.Json.JsonConvert::DeserializeXmlNode
+- Newtonsoft.Json.JsonConvert::DeserializeXmlNode
+- Newtonsoft.Json.JsonConvert::DeserializeXmlNode
+- Newtonsoft.Json.JsonConvert::SerializeXmlNode
+- Newtonsoft.Json.JsonConvert::SerializeXmlNode
+- Newtonsoft.Json.JsonConvert::SerializeXmlNode
+- Newtonsoft.Json.JsonSerializer::Binder
+- Newtonsoft.Json.JsonSerializerSettings::Binder
+- Newtonsoft.Json.Linq.ComponentModel.JPropertyDescriptor
+- Newtonsoft.Json.Linq.JArray::Count
+- Newtonsoft.Json.Linq.JContainer::AddingNew
+- Newtonsoft.Json.Linq.JContainer::ListChanged
+- Newtonsoft.Json.Linq.JContainer::OnAddingNew
+- Newtonsoft.Json.Linq.JContainer::OnListChanged
+- Newtonsoft.Json.Linq.JObject::Count
+- Newtonsoft.Json.Linq.JObject::OnPropertyChanging
+- Newtonsoft.Json.Linq.JObject::PropertyChanging
+- Newtonsoft.Json.Linq.JProperty::Children
+- Newtonsoft.Json.Schema.JsonSchema::Extends
+- Newtonsoft.Json.Schema.JsonSchema::Identity
+- Newtonsoft.Json.Schema.JsonSchema::Options
+- Newtonsoft.Json.Serialization.DefaultContractResolver::CreateISerializableContract
+- Newtonsoft.Json.Serialization.DefaultContractResolver::DefaultMembersSearchFlags
+- Newtonsoft.Json.Serialization.DynamicValueProvider
+- Newtonsoft.Json.Serialization.IReferenceResolver::AddReference
+- Newtonsoft.Json.Serialization.IReferenceResolver::GetReference
+- Newtonsoft.Json.Serialization.IReferenceResolver::IsReferenced
+- Newtonsoft.Json.Serialization.IReferenceResolver::ResolveReference
+- Newtonsoft.Json.Serialization.JsonISerializableContract
+
+Done

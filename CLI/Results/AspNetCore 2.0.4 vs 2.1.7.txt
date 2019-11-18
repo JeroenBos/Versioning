@@ -1,0 +1,2 @@
+Detected 0 potential compatibility issues
+between assembly Microsoft.AspNetCore versions 2.0.4.0 and 2.1.7.0.

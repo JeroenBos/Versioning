@@ -1,0 +1,8 @@
+Detected 2 potential compatibility issues
+between assembly Microsoft.AspNetCore.Http versions 1.1.2.0 and 2.0.3.0:
+
+The following members were not present in the newer assembly:
+- Microsoft.AspNetCore.Http.HttpContextFactory::.ctor
+- Microsoft.AspNetCore.Http.HttpContextFactory::.ctor
+
+Done

@@ -1,0 +1,80 @@
+Detected 72 potential compatibility issues
+between assembly NodaTime versions 1.4.0.0 and 2.0.0.0:
+
+The following members were not present in the newer assembly:
+- NodaTime.CalendarSystem::GetMaxMonth
+- NodaTime.CalendarSystem::UsesIsoDayOfWeek
+- NodaTime.ClockExtensions
+- NodaTime.DateTimeZone::Equals
+- NodaTime.DateTimeZone::Equals
+- NodaTime.DateTimeZone::EqualsImpl
+- NodaTime.DateTimeZone::GetHashCode
+- NodaTime.Duration::Ticks
+- NodaTime.IClock::Now
+- NodaTime.Instant::.ctor
+- NodaTime.Instant::Ticks
+- NodaTime.LocalDate::DayOfWeek
+- NodaTime.LocalDate::IsoDayOfWeek
+- NodaTime.LocalDate::WeekOfWeekYear
+- NodaTime.LocalDate::WeekYear
+- NodaTime.LocalDate::YearOfCentury
+- NodaTime.LocalDateTime::.ctor
+- NodaTime.LocalDateTime::.ctor
+- NodaTime.LocalDateTime::CenturyOfEra
+- NodaTime.LocalDateTime::DayOfWeek
+- NodaTime.LocalDateTime::IsoDayOfWeek
+- NodaTime.LocalDateTime::WeekOfWeekYear
+- NodaTime.LocalDateTime::WeekYear
+- NodaTime.LocalDateTime::YearOfCentury
+- NodaTime.LocalTime::.ctor
+- NodaTime.LocalTime::LocalDateTime
+- NodaTime.NodaConstants::BclEpoch
+- NodaTime.NodaConstants::DaysPerStandardWeek
+- NodaTime.NodaConstants::HoursPerStandardDay
+- NodaTime.NodaConstants::HoursPerStandardWeek
+- NodaTime.NodaConstants::MillisecondsPerStandardDay
+- NodaTime.NodaConstants::MillisecondsPerStandardWeek
+- NodaTime.NodaConstants::MinutesPerStandardDay
+- NodaTime.NodaConstants::MinutesPerStandardWeek
+- NodaTime.NodaConstants::SecondsPerStandardDay
+- NodaTime.NodaConstants::TicksPerStandardDay
+- NodaTime.NodaConstants::TicksPerStandardWeek
+- NodaTime.NodaConstants::UnixEpoch
+- NodaTime.OffsetDateTime::DayOfWeek
+- NodaTime.OffsetDateTime::IsoDayOfWeek
+- NodaTime.OffsetDateTime::WeekOfWeekYear
+- NodaTime.OffsetDateTime::WeekYear
+- NodaTime.OffsetDateTime::YearOfCentury
+- NodaTime.Period::Days
+- NodaTime.Period::Months
+- NodaTime.Period::Weeks
+- NodaTime.Period::Years
+- NodaTime.PeriodBuilder::Days
+- NodaTime.PeriodBuilder::Months
+- NodaTime.PeriodBuilder::Weeks
+- NodaTime.PeriodBuilder::Years
+- NodaTime.SystemClock::Now
+- NodaTime.Text.InstantPattern::WithMinMaxLabels
+- NodaTime.TimeZones.DateTimeZoneSourceExtensions
+- NodaTime.TimeZones.IDateTimeZoneSource::MapTimeZoneId
+- NodaTime.TimeZones.Resolvers::LenientResolver
+- NodaTime.TimeZones.Resolvers::ReturnEarlier
+- NodaTime.TimeZones.Resolvers::ReturnEndOfIntervalBefore
+- NodaTime.TimeZones.Resolvers::ReturnLater
+- NodaTime.TimeZones.Resolvers::ReturnStartOfIntervalAfter
+- NodaTime.TimeZones.Resolvers::StrictResolver
+- NodaTime.TimeZones.Resolvers::ThrowWhenAmbiguous
+- NodaTime.TimeZones.Resolvers::ThrowWhenSkipped
+- NodaTime.TimeZones.TzdbDateTimeZoneSource::MapTimeZoneId
+- NodaTime.ZonedDateTime::CenturyOfEra
+- NodaTime.ZonedDateTime::CompareTo
+- NodaTime.ZonedDateTime::DayOfWeek
+- NodaTime.ZonedDateTime::IsoDayOfWeek
+- NodaTime.ZonedDateTime::WeekOfWeekYear
+- NodaTime.ZonedDateTime::WeekYear
+- NodaTime.ZonedDateTime::YearOfCentury
+
+The following members reduced their visibility in the newer assembly:
+- NodaTime.TimeZones.ZoneInterval::.ctor (Public -> Assembly)
+
+Done

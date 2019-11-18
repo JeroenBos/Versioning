@@ -1,0 +1,5 @@
+Detected 1 issues:
+
+'NodaTime.Instant NodaTime.SystemClock::Now()' was not present in the newer dependency, and is referenced 1 times in the dependent assembly.
+
+Done

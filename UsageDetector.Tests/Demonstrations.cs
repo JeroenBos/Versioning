@@ -10,6 +10,10 @@ namespace Versioning.UsageDetector.Tests
 	// This class provides examples of runtime binding exceptions being thrown whenever an issues is raised too
 	class Demonstrations : TestHelper
 	{
+		/// <summary>
+		/// This test demonstrates that an compatibility issue is detected when moving from NodaTime v1.4.7 to v2.4.7,
+		/// and that this is in fact an issue, as demonstrated by the thrown runtime exception.
+		/// </summary>
 		[Test]
 		public async Task NodaTime_IClock_Now()
 		{

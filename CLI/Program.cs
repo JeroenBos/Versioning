@@ -95,11 +95,8 @@ namespace Versioning.CLI
 				writer.WriteLine(detectedIssue.ToDisplayString());
 			}
 
-			if (detectedIssues.Count != 0)
-			{
-				writer.WriteLine();
-				writer.WriteLine("Done");
-			}
+			writer.WriteLine();
+			writer.WriteLine("Done");
 		}
 
 
@@ -140,10 +137,7 @@ namespace Versioning.CLI
 				writer.WriteLine();
 			}
 
-			if (potentialIssues.Count != 0)
-			{
-				writer.WriteLine("Done");
-			}
+			writer.WriteLine("Done");
 		}
 	}
 }

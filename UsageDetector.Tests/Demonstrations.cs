@@ -36,7 +36,10 @@ class C
 				sourceCode_Main: new[] { sourceCode_Main },
 				otherDependencies: _NETFramework4_5_Or_Higher
 			);
+
+			// the entry point is the static void Main in the source code above.
 			var (_, _, errorOutput) = await entryPoint!();
+
 
 			// assert
 			Assert.AreEqual(1, detectedIssues.Count);

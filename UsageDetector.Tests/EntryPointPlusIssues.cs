@@ -7,9 +7,9 @@ namespace Versioning.UsageDetector.Tests
 	/// </summary>
 	public readonly struct EntryPointPlusIssues
 	{
-/// <summary>
-/// Gets a delegate wrapping a call to an assembly entry point in a seperate process.
-/// </summary>
+		/// <summary>
+		/// Gets a delegate wrapping a call to an assembly entry point in a seperate process.
+		/// </summary>
 		public ProcessDelegate? EntryPoint { get; }
 		public IReadOnlyList<IDetectedCompatibilityIssue> Issues { get; }
 		public EntryPointPlusIssues(ProcessDelegate? entryPoint, IReadOnlyList<IDetectedCompatibilityIssue> issues)
